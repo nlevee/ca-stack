@@ -1,0 +1,4 @@
+infra/**/.terraform/
+.gitsecret/keys/random_seed
+!*.secret
+workflow/azure/.env
