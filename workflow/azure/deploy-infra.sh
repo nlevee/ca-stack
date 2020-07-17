@@ -15,4 +15,4 @@ cd ${infra_path}/${workflow}
 [ ! -d ".terraform" ] \
     && terraform init -upgrade
 
-terraform apply
+terraform ${2:-apply}
