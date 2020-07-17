@@ -65,8 +65,8 @@ Description=CFSSL PKI Certificate Issuer
 After=network.target
 
 [Service]
-User=ca
-ExecStart=/usr/local/sbin/cfssl \
+User=root
+ExecStart=/usr/local/sbin/cfssl serve \
     -config server-config.json \
     -address 0.0.0.0 -port 8888 \
     -ca intermediate_ca.pem \
