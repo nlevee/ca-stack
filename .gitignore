@@ -3,4 +3,4 @@ infra/**/.terraform/
 !*.secret
 workflow/azure/.env
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
