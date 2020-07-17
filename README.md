@@ -1,5 +1,13 @@
 # Infra
 
+## TODO
+
+- terraform remote backend
+- bastion to access VM
+- provision ca-authority images
+- provision ca-issuer images
+- use packed image for vm
+
 ## Schema
 
 ```txt
