@@ -161,3 +161,5 @@ curl -Ss -H "Authorization: Bearer ${AccessToken}" -H "Content-type: application
     -d @cert.json
 rm -f intermediate.json
 
+# shutdown VM
+shutdown
