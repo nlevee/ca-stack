@@ -1,5 +1,3 @@
-
-
 # create ca-authority network interface
 resource "azurerm_network_interface" "ca-authority" {
   name                = "ca-authority-nic"
