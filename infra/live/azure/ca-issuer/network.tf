@@ -29,6 +29,7 @@ resource "azurerm_network_security_group" "allow-cfssl-inbound" {
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
 
+  # TODO : use azurerm_network_security_rule instead
   security_rule {
     name                       = "AllowCfsslInbound"
     priority                   = 100
