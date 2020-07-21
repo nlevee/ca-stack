@@ -2,19 +2,6 @@
 
 set -e
 
-# TODO : move to packer
-# startzone
-echo "Updating packages ..."
-apt update
-apt install -y curl jq openssl wget
-
-for tool in cfssljson cfssl mkbundle; do
-    curl -SsL https://github.com/cloudflare/cfssl/releases/download/v1.4.1/${tool}_1.4.1_linux_amd64 \
-        -o /usr/local/sbin/${tool}
-    chmod +x /usr/local/sbin/${tool}
-done
-# endzone
-
 mkdir ~/cfssl
 chmod 700 ~/cfssl
 cd ~/cfssl

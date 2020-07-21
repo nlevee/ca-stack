@@ -1,50 +1,7 @@
-# create ca-issuer network interfaces
-resource "azurerm_network_interface" "ca-vault" {
-  name                = "ca-vault-nic"
-  location            = module.variables.azure_location
+# fetch image id
+data "azurerm_image" "ca-issuer" {
+  name                = var.image_name
   resource_group_name = module.variables.azure_resource_group
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.from_vault_network_id
-    private_ip_address_allocation = "Dynamic"
-  }
-}
-
-resource "azurerm_network_interface" "ca-issuer" {
-  name                = "ca-issuer-nic"
-  location            = module.variables.azure_location
-  resource_group_name = module.variables.azure_resource_group
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.to_ca-issuer_network_id
-    private_ip_address_allocation = "Dynamic"
-  }
-}
-
-# add sec group to allow 8888 inbound traffic
-resource "azurerm_network_security_group" "allow-cfssl-inbound" {
-  name                = "AllowCfsslInbound"
-  location            = module.variables.azure_location
-  resource_group_name = module.variables.azure_resource_group
-
-  security_rule {
-    name                       = "AllowCfsslInbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8888"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }
-}
-
-resource "azurerm_network_interface_security_group_association" "ca-issuer-secgroup-cfssl" {
-  network_interface_id      = azurerm_network_interface.ca-issuer.id
-  network_security_group_id = azurerm_network_security_group.allow-cfssl-inbound.id
 }
 
 # create ca-issuer vm
@@ -52,7 +9,7 @@ resource "azurerm_linux_virtual_machine" "ca-issuer" {
   name                = "ca-issuer-vm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
-  size                = "Standard_F2"
+  size                = "Standard_B2s"
   admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.ca-vault.id,
@@ -73,12 +30,7 @@ resource "azurerm_linux_virtual_machine" "ca-issuer" {
     type = "SystemAssigned"
   }
 
-  source_image_reference {
-    publisher = "Debian"
-    offer     = "debian-10"
-    sku       = "10-backports"
-    version   = "latest"
-  }
+  source_image_id = data.azurerm_image.ca-issuer.id
 }
 
 # add startup script
@@ -91,7 +43,7 @@ resource "azurerm_virtual_machine_extension" "ca-issuer-script" {
 
   protected_settings = <<SETTINGS
     {
-        "script": "${filebase64("${path.module}/scripts/startup-issuer.sh")}"
+        "script": "${filebase64("${path.module}/scripts/provision-issuer.sh")}"
     }
 SETTINGS
 }
@@ -107,7 +59,7 @@ resource "azurerm_key_vault_access_policy" "ca-issuer-ap-vault" {
     "get"
   ]
 
-  certificate_permissions = [
-    "get"
-  ]
+  #   certificate_permissions = [
+  #     "get"
+  #   ]
 }

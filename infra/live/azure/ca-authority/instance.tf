@@ -1,14 +1,7 @@
-# create ca-authority network interface
-resource "azurerm_network_interface" "ca-authority" {
-  name                = "ca-authority-nic"
-  location            = module.variables.azure_location
+# fetch image id
+data "azurerm_image" "ca-authority" {
+  name                = var.image_name
   resource_group_name = module.variables.azure_resource_group
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.to_vault_network_id
-    private_ip_address_allocation = "Dynamic"
-  }
 }
 
 # create ca-authority vm
@@ -36,12 +29,7 @@ resource "azurerm_linux_virtual_machine" "ca-authority" {
     type = "SystemAssigned"
   }
 
-  source_image_reference {
-    publisher = "Debian"
-    offer     = "debian-10"
-    sku       = "10-backports"
-    version   = "latest"
-  }
+  source_image_id = data.azurerm_image.ca-authority.id
 }
 
 # add startup script
@@ -54,7 +42,7 @@ resource "azurerm_virtual_machine_extension" "ca-authority-script" {
 
   protected_settings = <<SETTINGS
     {
-        "script": "${filebase64("${path.module}/scripts/startup-authority.sh")}"
+        "script": "${filebase64("${path.module}/scripts/provision-authority.sh")}"
     }
 SETTINGS
 }
