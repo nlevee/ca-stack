@@ -11,7 +11,7 @@ AccessToken=$(curl -Ss -H "Metadata: true" "http://169.254.169.254/metadata/iden
 
 echo "Fetch Root Certificate from vault ..."
 echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
-    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert?api-version=7.0" | jq -r '.value' | base64 -d)" > /usr/local/share/ca-certificates/ca.pem
+    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" | jq -r '.value' | base64 -d)" > /usr/local/share/ca-certificates/ca.pem
 
 # update ca cert repos
 update-ca-certificates
@@ -19,7 +19,7 @@ update-ca-certificates
 # fetch intermediate bundle certificate
 echo "Fetch Intermediate Certificate from Vault ..."
 echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
-    "https://ca-stack-issuer-vault.vault.azure.net/secrets/CaIntermediate?api-version=7.0" | jq -r .value)" > ~/cfssl/intermediate_ca.pem
+    "https://ca-stack-issuer-vault.vault.azure.net/secrets/CaIntermediate2?api-version=7.0" | jq -r .value)" > ~/cfssl/intermediate_ca.pem
 
 # split pem
 awk 'BEGIN {c=0;} /BEGIN CERT/{c++} { print > "intermediate_ca." c ".pem"}' < intermediate_ca.pem
