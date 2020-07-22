@@ -9,7 +9,7 @@ resource "azurerm_linux_virtual_machine" "ca-authority" {
   name                = "ca-authority-vm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
-  size                = "Standard_F2"
+  size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.ca-authority.id,

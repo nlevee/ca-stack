@@ -1,9 +1,15 @@
+# fetch image id
+data "azurerm_image" "userspace" {
+  name                = var.image_name
+  resource_group_name = module.variables.azure_resource_group
+}
+
 # create userspace vm
 resource "azurerm_linux_virtual_machine" "userspace" {
   name                = "userspace-vm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
-  size                = "Standard_B2s"
+  size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.ca-vault.id,
@@ -24,12 +30,7 @@ resource "azurerm_linux_virtual_machine" "userspace" {
     type = "SystemAssigned"
   }
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
+  source_image_id = data.azurerm_image.userspace.id
 }
 
 # add startup script
