@@ -2,6 +2,7 @@
 
 ## TODO
 
+- use var in provision script for vault and CA names
 - terraform remote backend
 - bastion to access VM
 - use multiple vault for certificate&key
