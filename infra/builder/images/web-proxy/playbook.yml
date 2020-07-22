@@ -1,0 +1,13 @@
+---
+- hosts: default
+  become: true
+
+  vars:
+    cfssl_version: "1.4.1"
+
+  tasks:
+    - include_role:
+        name: "{{ playbook_dir }}/../../provisioners/roles/install-pkg"
+
+    - include_role:
+        name: "{{ playbook_dir }}/../../provisioners/roles/install-cfssl"
