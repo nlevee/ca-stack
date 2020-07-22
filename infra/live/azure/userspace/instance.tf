@@ -49,7 +49,7 @@ SETTINGS
 }
 
 # access policy to access to vault
-resource "azurerm_key_vault_access_policy" "userspace-ap-vault" {
+resource "azurerm_key_vault_access_policy" "userspace-policy-vm-vault" {
   key_vault_id = data.terraform_remote_state.vault.outputs.vault_id
 
   tenant_id = azurerm_linux_virtual_machine.userspace.identity[0].tenant_id

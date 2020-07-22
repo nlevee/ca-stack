@@ -49,8 +49,20 @@ SETTINGS
 }
 
 # access policy to access to vault
-resource "azurerm_key_vault_access_policy" "ca-issuer-ap-vault" {
-  key_vault_id = data.terraform_remote_state.vault.outputs.vault_id
+resource "azurerm_key_vault_access_policy" "ca-issuer-policy-vm-vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.vm_vault_id
+
+  tenant_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].principal_id
+
+  secret_permissions = [
+    "get"
+  ]
+}
+
+# access policy to access to vault
+resource "azurerm_key_vault_access_policy" "ca-issuer-policy-issuer-vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.issuer_vault_id
 
   tenant_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].tenant_id
   object_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].principal_id
@@ -59,7 +71,7 @@ resource "azurerm_key_vault_access_policy" "ca-issuer-ap-vault" {
     "get"
   ]
 
-  #   certificate_permissions = [
-  #     "get"
-  #   ]
+  certificate_permissions = [
+    "get"
+  ]
 }

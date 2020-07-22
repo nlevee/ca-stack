@@ -19,7 +19,7 @@ update-ca-certificates
 # fetch intermediate bundle certificate
 echo "Fetch Intermediate Certificate from Vault ..."
 echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
-    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaIntermediate?api-version=7.0" | jq -r .value)" > ~/cfssl/intermediate_ca.pem
+    "https://ca-stack-issuer-vault.vault.azure.net/secrets/CaIntermediate?api-version=7.0" | jq -r .value)" > ~/cfssl/intermediate_ca.pem
 
 # split pem
 awk 'BEGIN {c=0;} /BEGIN CERT/{c++} { print > "intermediate_ca." c ".pem"}' < intermediate_ca.pem
@@ -69,3 +69,5 @@ EOF
 # enable at boot and start cfssl server
 systemctl enable cfssl-server
 systemctl start cfssl-server
+
+exit 0

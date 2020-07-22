@@ -144,9 +144,11 @@ cat <<EOF > cert.json
 }
 EOF
 curl -Ss -H "Authorization: Bearer ${AccessToken}" -H "Content-type: application/json" -X POST \
-    "https://ca-stack-vm-vault.vault.azure.net/certificates/CaIntermediate/import?api-version=7.0" \
+    "https://ca-stack-issuer-vault.vault.azure.net/certificates/CaIntermediate/import?api-version=7.0" \
     -d @cert.json
 rm -f intermediate.json
 
 # shutdown VM
-shutdown
+shutdown &
+
+exit 0

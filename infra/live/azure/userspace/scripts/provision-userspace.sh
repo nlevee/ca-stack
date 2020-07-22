@@ -11,3 +11,7 @@ echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
 
 # update ca cert repos
 update-ca-certificates
+
+# create a new client certificate
+
+# 
