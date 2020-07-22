@@ -24,9 +24,11 @@ resource "azurerm_key_vault" "issuer-vault" {
     default_action = "Deny"
     bypass         = "AzureServices"
 
+    ip_rules = ["185.144.47.88/32"]
+
     # assign access from subnet
     virtual_network_subnet_ids = [
-      data.terraform_remote_state.networks.outputs.to_vault_network_id
+      data.terraform_remote_state.networks.outputs.sub_vault_network_id
     ]
   }
 }
@@ -46,10 +48,11 @@ resource "azurerm_key_vault" "vm-vault" {
     default_action = "Deny"
     bypass         = "AzureServices"
 
+    ip_rules = ["185.144.47.88/32"]
+
     # assign access from subnet
     virtual_network_subnet_ids = [
-      data.terraform_remote_state.networks.outputs.from_vault_network_id,
-      data.terraform_remote_state.networks.outputs.to_vault_network_id
+      data.terraform_remote_state.networks.outputs.sub_vault_network_id
     ]
   }
 }

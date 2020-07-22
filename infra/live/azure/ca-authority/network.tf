@@ -6,7 +6,7 @@ resource "azurerm_network_interface" "ca-authority" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.to_vault_network_id
+    subnet_id                     = data.terraform_remote_state.networks.outputs.sub_vault_network_id
     private_ip_address_allocation = "Dynamic"
   }
 }

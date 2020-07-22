@@ -29,6 +29,10 @@ resource "azurerm_linux_virtual_machine" "ca-authority" {
     type = "SystemAssigned"
   }
 
+  boot_diagnostics {
+    storage_account_uri = "https://castackbootdiag.blob.core.windows.net/"
+  }
+
   source_image_id = data.azurerm_image.ca-authority.id
 }
 
