@@ -24,7 +24,7 @@ resource "azurerm_key_vault" "issuer-vault" {
     default_action = "Deny"
     bypass         = "AzureServices"
 
-    ip_rules = ["185.144.47.88/32"]
+    ip_rules = var.ip_rules
 
     # assign access from subnet
     virtual_network_subnet_ids = [
@@ -48,7 +48,7 @@ resource "azurerm_key_vault" "vm-vault" {
     default_action = "Deny"
     bypass         = "AzureServices"
 
-    ip_rules = ["185.144.47.88/32"]
+    ip_rules = var.ip_rules
 
     # assign access from subnet
     virtual_network_subnet_ids = [

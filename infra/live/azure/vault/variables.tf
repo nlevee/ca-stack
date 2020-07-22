@@ -3,3 +3,8 @@ module "variables" {
 
   workspace = "azure-staging"
 }
+
+variable "ip_rules" {
+  type    = list
+  default = []
+}
