@@ -11,7 +11,7 @@ source ${base_path}/.env
 
 # create template temporary file
 tmpfile=$(mktemp /tmp/packer-script.XXXXXX)
-jq --slurp '.[0]' \
+jq --slurp '.[0] * .[1]' \
     ${builder_path}/builders/azure/builder.json \
     ${builder_path}/images/${img_name}/provisioner.json > ${tmpfile}
 
