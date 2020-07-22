@@ -1,0 +1,5 @@
+---
+cfssl_binaries:
+  - cfssljson
+  - cfssl
+  - mkbundle

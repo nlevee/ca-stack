@@ -1,0 +1,8 @@
+---
+- name: Download cfssl binaries
+  get_url:
+    url: https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/{{ item }}_{{ cfssl_version }}_linux_amd64
+    dest: /usr/local/sbin/{{ item }}
+    checksum: sha256:https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_checksums.txt
+    mode: u=rwx,g=rx,o=rx
+  loop: "{{ cfssl_binaries }}"

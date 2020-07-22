@@ -6,22 +6,8 @@
     cfssl_version: "1.4.1"
 
   tasks:
-    - name: install required packages
-      package:
-        name:
-          - curl
-          - jq
-          - openssl
-          - wget
-        state: present
+    - include_role:
+        name: "{{ playbook_dir }}/../../provisioners/roles/install-pkg"
 
-    - name: Download cfssl binaries
-      get_url:
-        url: https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/{{ item }}_{{ cfssl_version }}_linux_amd64
-        dest: /usr/local/sbin/{{ item }}
-        checksum: sha256:https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/{{ item }}_{{ cfssl_version }}_linux_checksums.txt
-        mode: u=rwx,g=rx,o=rx
-      loop:
-        - cfssljson
-        - cfssl
-        - mkbundle
+    - include_role:
+        name: "{{ playbook_dir }}/../../provisioners/roles/install-cfssl"

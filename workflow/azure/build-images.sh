@@ -16,10 +16,16 @@ jq --slurp '.[0] * .[1]' \
     ${builder_path}/images/${img_name}/provisioner.json > ${tmpfile}
 
 # validation du template
-packer validate -var "managed_image_name=${img_name}" ${tmpfile}
+packer validate \
+    -var "managed_image_name=${img_name}"\
+    -var "playbook_path=${builder_path}/images/${img_name}" \
+    ${tmpfile}
 
 # execution du build
-packer build -var "managed_image_name=${img_name}" ${tmpfile}
+packer build \
+    -var "managed_image_name=${img_name}"\
+    -var "playbook_path=${builder_path}/images/${img_name}" \
+    ${tmpfile}
 
 # del template temporary file 
 rm -f ${tmpfile}

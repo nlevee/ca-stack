@@ -1,0 +1,9 @@
+---
+required_packages:
+  - curl
+  - jq
+  - openssl
+  - wget
+  - cloud-init
+
+system_timezone: Europe/Paris

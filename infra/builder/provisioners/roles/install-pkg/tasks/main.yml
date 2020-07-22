@@ -1,0 +1,10 @@
+---
+- name: install required packages
+  package:
+    name: "{{ required_packages }}"
+    state: present
+
+- name: Set timezone to {{ system_timezone }}
+  become: true
+  timezone:
+    name: "{{ system_timezone }}"
