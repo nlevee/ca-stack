@@ -1,5 +1,16 @@
 # Infra
 
+## Prérequis
+
+Installer [pre-commit](https://pre-commit.com/)
+
+Sur Linux :
+
+```bash
+curl https://pre-commit.com/install-local.py | python -
+pre-commit install
+```
+
 ## TODO
 
 - use var in provision script for vault and CA names
