@@ -12,7 +12,7 @@ resource "azurerm_linux_virtual_machine" "userspace" {
   size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.ca-vault.id,
+    azurerm_network_interface.internal.id,
     azurerm_network_interface.ca-issuer.id,
   ]
 
@@ -30,12 +30,16 @@ resource "azurerm_linux_virtual_machine" "userspace" {
     type = "SystemAssigned"
   }
 
+  boot_diagnostics {
+    storage_account_uri = "https://castackbootdiag.blob.core.windows.net/"
+  }
+
   source_image_id = data.azurerm_image.userspace.id
 }
 
 # add startup script
 resource "azurerm_virtual_machine_extension" "userspace-script" {
-  name                 = "startup-issuer"
+  name                 = "startup-userspace"
   virtual_machine_id   = azurerm_linux_virtual_machine.userspace.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"

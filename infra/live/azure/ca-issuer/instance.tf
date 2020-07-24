@@ -12,7 +12,6 @@ resource "azurerm_linux_virtual_machine" "ca-issuer" {
   size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.ca-vault.id,
     azurerm_network_interface.ca-issuer.id,
   ]
 
