@@ -7,22 +7,33 @@ chmod 700 ~/cfssl
 cd ~/cfssl
 
 # auth in vault
-AccessToken=$(curl -Ss -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r '.access_token')
+AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r '.access_token')
 
 echo "Fetch Root Certificate from vault ..."
-echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
-    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" | jq -r '.value' | base64 -d)" > /usr/local/share/ca-certificates/ca.pem
+CaRootCert="$(curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
+    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" | jq -r '.value' | base64 -d)"
+if [ -z "$CaRootCert" ]; then
+    exit 1
+fi
+echo $CaRootCert > /usr/local/share/ca-certificates/ca.pem
 
 # update ca cert repos
 update-ca-certificates
 
 # fetch intermediate bundle certificate
 echo "Fetch Intermediate Certificate from Vault ..."
-echo "$(curl -Ss -H "Authorization: Bearer ${AccessToken}" -X GET \
-    "https://ca-stack-issuer-vault.vault.azure.net/secrets/CaIntermediate2?api-version=7.0" | jq -r .value)" > ~/cfssl/intermediate_ca.pem
+CaIntermediate="$(curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
+    "https://ca-stack-issuer-vault.vault.azure.net/secrets/CaIntermediate2?api-version=7.0" | jq -r .value)"
+if [ -z "$CaIntermediate" ]; then
+    exit 2
+fi
+echo $CaIntermediate > ~/cfssl/intermediate_ca.pem
 
 # split pem
 awk 'BEGIN {c=0;} /BEGIN CERT/{c++} { print > "intermediate_ca." c ".pem"}' < intermediate_ca.pem
+if [ ! -f "intermediate_ca.0.pem" ] || [ -f "intermediate_ca.1.pem" ]; then
+    exit 3
+fi 
 mv intermediate_ca.0.pem intermediate_ca-key.pkcs8
 chmod 700 intermediate_ca-key.pkcs8
 mv intermediate_ca.1.pem intermediate_ca.pem
