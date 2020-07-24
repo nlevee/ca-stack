@@ -4,5 +4,5 @@ repos:
     hooks:
       - id: terraform-fmt
       - id: terraform-validate
-      # - id: tflint
+      - id: tflint
       - id: shellcheck

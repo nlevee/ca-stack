@@ -8,7 +8,15 @@ Sur Linux :
 
 ```bash
 curl https://pre-commit.com/install-local.py | python -
-pre-commit install
+~/bin/pre-commit install
+```
+
+Installer [tflint](https://github.com/terraform-linters/tflint)
+
+Sur Linux :
+
+```bash
+curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 ```
 
 ## TODO
