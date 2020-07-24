@@ -122,7 +122,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in intermediate_ca-key.p
 cat intermediate_ca-key.pkcs8 intermediate_ca.pem > intermediate.pem
 
 # auth in vault
-AccessToken=$(curl -Ss -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r '.access_token')
+AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r '.access_token')
 
 cd ~
 
