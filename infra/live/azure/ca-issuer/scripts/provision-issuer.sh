@@ -2,7 +2,7 @@
 
 set -e
 
-[ ! -d "~/cfssl" ] \
+[ ! -d ~/cfssl ] \
     && mkdir ~/cfssl \
     && chmod 700 ~/cfssl
 
@@ -27,7 +27,7 @@ curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
 
 # split pem
 awk 'BEGIN {c=0;} /BEGIN CERT/{c++} { print > "intermediate_ca." c ".pem"}' < intermediate_ca.pem
-if [ ! -f "intermediate_ca.0.pem" ] || [ -f "intermediate_ca.1.pem" ]; then
+if [ ! -f "intermediate_ca.0.pem" ] || [ ! -f "intermediate_ca.1.pem" ]; then
     exit 3
 fi 
 mv intermediate_ca.0.pem intermediate_ca-key.pkcs8
@@ -54,7 +54,7 @@ EOF
 # create system service to start issuer server
 [ ! -d "/etc/systemd/system" ] \
     && mkdir -p /etc/systemd/system
-    
+
 cat <<EOF > /etc/systemd/system/cfssl-server.service
 [Unit]
 Description=CFSSL PKI Certificate Issuer
