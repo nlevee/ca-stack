@@ -2,8 +2,10 @@
 
 set -e
 
-mkdir ~/cfssl
-chmod 700 ~/cfssl
+[ ! -d "~/cfssl" ] \
+    && mkdir ~/cfssl \
+    && chmod 700 ~/cfssl
+
 cd ~/cfssl
 cat <<EOF > ca-config.json
 {
@@ -86,7 +88,9 @@ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 echo "Convert key to pkcs8"
 openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in ca-key.pem -out ca-key.pkcs8
 
-mkdir ~/cfssl/intermediate 
+[ ! -d "~/cfssl/intermediate" ] \
+    && mkdir ~/cfssl/intermediate 
+    
 cd ~/cfssl/intermediate
 cat <<EOF > intermediate.json
 {
