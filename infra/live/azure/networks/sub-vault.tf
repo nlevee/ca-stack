@@ -5,3 +5,8 @@ resource "azurerm_subnet" "from_vault" {
   address_prefixes     = ["10.0.1.0/24"]
   service_endpoints    = ["Microsoft.KeyVault"]
 }
+
+resource "azurerm_subnet_network_security_group_association" "sub-vault-default" {
+  subnet_id                 = azurerm_subnet.from_vault.id
+  network_security_group_id = module.vault_nsg.nsg_id
+}
