@@ -64,3 +64,17 @@ resource "azurerm_network_security_rule" "allow-keyvault-outbound" {
   resource_group_name         = module.variables.azure_resource_group
   network_security_group_name = module.default_nsg.nsg_name
 }
+
+resource "azurerm_network_security_rule" "ca-allow-keyvault-outbound" {
+  name                        = "AllowOutBoundKeyVault"
+  priority                    = 100
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "VirtualNetwork"
+  destination_address_prefix  = "AzureKeyVault"
+  resource_group_name         = module.variables.azure_resource_group
+  network_security_group_name = module.vault_nsg.nsg_name
+}
