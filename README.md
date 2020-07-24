@@ -61,5 +61,6 @@ Build de l'infra :
 ./workflow/azure/deploy-infra.sh vault
 ./workflow/azure/deploy-infra.sh ca-authority
 ./workflow/azure/deploy-infra.sh ca-issuer
+./workflow/azure/deploy-infra.sh web-proxy
 ./workflow/azure/deploy-infra.sh userspace
 ```
