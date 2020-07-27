@@ -33,7 +33,7 @@ resource "azurerm_application_security_group" "ask-issue-asg" {
 # add rules to secgroup
 # Allow traffic in for cfssl
 resource "azurerm_network_security_rule" "allow-cfssl-inbound" {
-  name                   = "AllowCfsslInbound"
+  name                   = "Allow-CfsslInBound"
   priority               = 100
   direction              = "Inbound"
   access                 = "Allow"
@@ -49,25 +49,36 @@ resource "azurerm_network_security_rule" "allow-cfssl-inbound" {
   resource_group_name         = module.variables.azure_resource_group
   network_security_group_name = module.default_nsg.nsg_name
 }
-
-# Allow trafic out for AzureKeyVault
-resource "azurerm_network_security_rule" "allow-keyvault-outbound" {
-  name                        = "AllowOutBoundKeyVault"
-  priority                    = 100
-  direction                   = "Outbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "VirtualNetwork"
-  destination_address_prefix  = "AzureKeyVault"
+resource "azurerm_network_security_rule" "allow-cfssl-outbound" {
+  name                   = "Allow-CfsslOutBound"
+  priority               = 100
+  direction              = "Outbound"
+  access                 = "Allow"
+  protocol               = "Tcp"
+  source_port_range      = "*"
+  destination_port_range = "8888"
+  source_application_security_group_ids = [
+    azurerm_application_security_group.ask-issue-asg.id,
+  ]
+  destination_application_security_group_ids = [
+    azurerm_application_security_group.ca-issuer-asg.id,
+  ]
   resource_group_name         = module.variables.azure_resource_group
   network_security_group_name = module.default_nsg.nsg_name
 }
 
-resource "azurerm_network_security_rule" "ca-allow-keyvault-outbound" {
-  name                        = "AllowOutBoundKeyVault"
-  priority                    = 100
+# Allow trafic out for AzureKeyVault
+locals {
+  nsgs_keyvaul_outbound = [
+    module.default_nsg.nsg_name,
+    module.vault_nsg.nsg_name,
+  ]
+}
+resource "azurerm_network_security_rule" "allow-keyvault-outbound" {
+  count = length(local.nsgs_keyvaul_outbound)
+
+  name                        = "Allow-KeyVaultOutBound"
+  priority                    = 512
   direction                   = "Outbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -76,5 +87,5 @@ resource "azurerm_network_security_rule" "ca-allow-keyvault-outbound" {
   source_address_prefix       = "VirtualNetwork"
   destination_address_prefix  = "AzureKeyVault"
   resource_group_name         = module.variables.azure_resource_group
-  network_security_group_name = module.vault_nsg.nsg_name
+  network_security_group_name = local.nsgs_keyvaul_outbound[count.index]
 }
