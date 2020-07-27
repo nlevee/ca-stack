@@ -63,3 +63,13 @@ resource "azurerm_key_vault_access_policy" "web-proxy-policy-vm-vault" {
     "get"
   ]
 }
+resource "azurerm_key_vault_access_policy" "web-proxy-policy-issue-vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.issuer_vault_id
+
+  tenant_id = azurerm_linux_virtual_machine.web-proxy.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.web-proxy.identity[0].principal_id
+
+  certificate_permissions = [
+    "get"
+  ]
+}
