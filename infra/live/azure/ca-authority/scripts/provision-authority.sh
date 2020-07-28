@@ -14,7 +14,7 @@ cat <<EOF > ca-config.json
       "expiry": "8760h"
     },
     "profiles": {
-      "intermediate_ca": {
+      "intermediate": {
         "usages": [
             "signing",
             "digital signature",
@@ -27,37 +27,8 @@ cat <<EOF > ca-config.json
         "expiry": "720h",
         "ca_constraint": {
             "is_ca": true,
-            "max_path_len": 0, 
-            "max_path_len_zero": true
+            "max_path_len": 1
         }
-      },
-      "peer": {
-        "usages": [
-            "signing",
-            "digital signature",
-            "key encipherment", 
-            "client auth",
-            "server auth"
-        ],
-        "expiry": "720h"
-      },
-      "server": {
-        "usages": [
-          "signing",
-          "digital signing",
-          "key encipherment",
-          "server auth"
-        ],
-        "expiry": "720h"
-      },
-      "client": {
-        "usages": [
-          "signing",
-          "digital signature",
-          "key encipherment", 
-          "client auth"
-        ],
-        "expiry": "720h"
       }
     }
   }
@@ -97,7 +68,7 @@ cat <<EOF > intermediate.json
   "CN": "MyOrg Intermediate CA",
   "key": {
     "algo": "rsa",
-    "size": 2048
+    "size": 4096
   },
   "names": [
     {
@@ -117,7 +88,7 @@ cfssl genkey intermediate.json | cfssljson -bare intermediate_ca
 cfssl sign -ca ~/cfssl/ca.pem \
   -ca-key ~/cfssl/ca-key.pem \
   -config ~/cfssl/ca-config.json \
-  -profile intermediate_ca intermediate_ca.csr | cfssljson -bare intermediate_ca
+  -profile intermediate intermediate_ca.csr | cfssljson -bare intermediate_ca
 
 # convert key to pkcs8
 openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in intermediate_ca-key.pem -out intermediate_ca-key.pkcs8

@@ -24,7 +24,6 @@ curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/inst
 - use var in provision script for vault and CA names
 - terraform remote backend
 - bastion to access VM
-- use multiple vault for certificate&key
 - add firewall.s
 - wip userspace
 - find a proxy

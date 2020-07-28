@@ -12,8 +12,8 @@ resource "azurerm_linux_virtual_machine" "web-proxy" {
   size                = "Standard_B2s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.internal.id,
     azurerm_network_interface.ca-issuer.id,
+    azurerm_network_interface.internal.id,
   ]
 
   admin_ssh_key {

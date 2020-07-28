@@ -14,7 +14,7 @@ AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/ide
 echo "Fetch Root Certificate from vault ..."
 curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
     "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" \
-    | jq -r '.value' | base64 -d > /usr/local/share/ca-certificates/ca.pem
+    | jq -r '.value' | base64 -d > /usr/local/share/ca-certificates/ca.crt
 
 # update ca cert repos
 update-ca-certificates
@@ -37,15 +37,56 @@ mv intermediate_ca.1.pem intermediate_ca.pem
 # serve issuer server
 cat <<EOF > server-config.json
 {
-  "signing": {
-    "default": {
-        "usages": [
+  "signing":{
+    "default":{
+      "expiry":"720h"
+    },
+    "profiles":{
+      "intermediate":{
+        "expiry":"720h",
+        "usages":[
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "cert sign",
+          "crl sign",
+          "server auth",
+          "client auth"
+        ],
+        "ca_constraint":{
+          "is_ca":true,
+          "max_path_len":0,
+          "max_path_len_zero":true
+        }
+      },
+      "peer":{
+        "usages":[
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "client auth",
+          "server auth"
+        ],
+        "expiry":"720h"
+      },
+      "server":{
+        "usages":[
           "signing",
           "digital signing",
           "key encipherment",
           "server auth"
         ],
-        "expiry": "720h"
+        "expiry":"720h"
+      },
+      "client":{
+        "usages":[
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "client auth"
+        ],
+        "expiry":"720h"
+      }
     }
   }
 }
@@ -76,6 +117,7 @@ WantedBy=multi-user.target
 EOF
 
 # enable at boot and start cfssl server
+systemctl daemon-reload
 systemctl enable cfssl-server
 systemctl start cfssl-server
 
