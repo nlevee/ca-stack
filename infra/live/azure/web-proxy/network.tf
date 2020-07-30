@@ -1,25 +1,25 @@
 # create web-proxy network interface
-resource "azurerm_network_interface" "internal" {
-  name                = "web-proxy-internal-nic"
+resource "azurerm_network_interface" "proxy" {
+  name                = "WebProxyProxyNic"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.sub_proxy_network_id
+    subnet_id                     = data.terraform_remote_state.networks.outputs.subnet_proxy_id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
 # create ca-issuer network interfaces
-resource "azurerm_network_interface" "ca-issuer" {
-  name                = "web-proxy-issuer-nic"
+resource "azurerm_network_interface" "issuer" {
+  name                = "WebProxyIssuerNic"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.networks.outputs.sub_issuer_network_id
+    subnet_id                     = data.terraform_remote_state.networks.outputs.subnet_issuer_id
     private_ip_address_allocation = "Dynamic"
   }
 }

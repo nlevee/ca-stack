@@ -6,14 +6,14 @@ data "azurerm_image" "userspace" {
 
 # create userspace vm
 resource "azurerm_linux_virtual_machine" "userspace" {
-  name                = "userspace-vm"
+  name                = "UserspaceVm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
   size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.internal.id,
-    azurerm_network_interface.ca-issuer.id,
+    azurerm_network_interface.issuer.id,
+    azurerm_network_interface.proxy.id,
   ]
 
   admin_ssh_key {
@@ -38,8 +38,8 @@ resource "azurerm_linux_virtual_machine" "userspace" {
 }
 
 # add startup script
-resource "azurerm_virtual_machine_extension" "userspace-script" {
-  name                 = "startup-userspace"
+resource "azurerm_virtual_machine_extension" "provision" {
+  name                 = "provision"
   virtual_machine_id   = azurerm_linux_virtual_machine.userspace.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -53,8 +53,8 @@ SETTINGS
 }
 
 # access policy to access to vault
-resource "azurerm_key_vault_access_policy" "userspace-policy-vm-vault" {
-  key_vault_id = data.terraform_remote_state.vault.outputs.vault_id
+resource "azurerm_key_vault_access_policy" "vm_vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.vm_vault_id
 
   tenant_id = azurerm_linux_virtual_machine.userspace.identity[0].tenant_id
   object_id = azurerm_linux_virtual_machine.userspace.identity[0].principal_id

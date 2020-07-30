@@ -1,18 +1,18 @@
 # fetch image id
-data "azurerm_image" "ca-issuer" {
+data "azurerm_image" "ca_issuer" {
   name                = var.image_name
   resource_group_name = module.variables.azure_resource_group
 }
 
-# create ca-issuer vm
-resource "azurerm_linux_virtual_machine" "ca-issuer" {
-  name                = "ca-issuer-vm"
+# create ca_issuer vm
+resource "azurerm_linux_virtual_machine" "ca_issuer" {
+  name                = "CaIssuerVm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
   size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.ca-issuer.id,
+    azurerm_network_interface.ca_issuer.id,
   ]
 
   admin_ssh_key {
@@ -33,13 +33,13 @@ resource "azurerm_linux_virtual_machine" "ca-issuer" {
     storage_account_uri = "https://castackbootdiag.blob.core.windows.net/"
   }
 
-  source_image_id = data.azurerm_image.ca-issuer.id
+  source_image_id = data.azurerm_image.ca_issuer.id
 }
 
 # add startup script
-resource "azurerm_virtual_machine_extension" "ca-issuer-script" {
-  name                 = "startup-issuer"
-  virtual_machine_id   = azurerm_linux_virtual_machine.ca-issuer.id
+resource "azurerm_virtual_machine_extension" "provision" {
+  name                 = "provision"
+  virtual_machine_id   = azurerm_linux_virtual_machine.ca_issuer.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
@@ -52,11 +52,11 @@ SETTINGS
 }
 
 # access policy to access to vault
-resource "azurerm_key_vault_access_policy" "ca-issuer-policy-vm-vault" {
+resource "azurerm_key_vault_access_policy" "vm_vault" {
   key_vault_id = data.terraform_remote_state.vault.outputs.vm_vault_id
 
-  tenant_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].tenant_id
-  object_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].principal_id
+  tenant_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].principal_id
 
   secret_permissions = [
     "get"
@@ -64,11 +64,11 @@ resource "azurerm_key_vault_access_policy" "ca-issuer-policy-vm-vault" {
 }
 
 # access policy to access to vault
-resource "azurerm_key_vault_access_policy" "ca-issuer-policy-issuer-vault" {
+resource "azurerm_key_vault_access_policy" "issuer_vault" {
   key_vault_id = data.terraform_remote_state.vault.outputs.issuer_vault_id
 
-  tenant_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].tenant_id
-  object_id = azurerm_linux_virtual_machine.ca-issuer.identity[0].principal_id
+  tenant_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].principal_id
 
   secret_permissions = [
     "get"
