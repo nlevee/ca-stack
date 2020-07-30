@@ -1,5 +1,6 @@
 ---
 - name: Download cfssl binaries
+  become: true
   get_url:
     url: https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/{{ item }}_{{ cfssl_version }}_linux_amd64
     dest: /usr/local/sbin/{{ item }}

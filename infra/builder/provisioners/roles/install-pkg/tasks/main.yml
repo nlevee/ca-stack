@@ -1,5 +1,6 @@
 ---
 - name: install required packages
+  become: true
   package:
     name: "{{ required_packages }}"
     state: present

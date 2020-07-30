@@ -11,3 +11,8 @@
 
     - include_role:
         name: "{{ playbook_dir }}/../../provisioners/roles/install-cfssl"
+
+    - name: install mitmproxy
+      package:
+        name: mitmproxy
+        state: present
