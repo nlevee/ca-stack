@@ -14,6 +14,7 @@ resource "azurerm_linux_virtual_machine" "web_proxy" {
   network_interface_ids = [
     azurerm_network_interface.issuer.id,
     azurerm_network_interface.proxy.id,
+    azurerm_network_interface.web.id,
   ]
 
   admin_ssh_key {
