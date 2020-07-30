@@ -30,7 +30,57 @@ resource "azurerm_application_security_group" "ask-issue-asg" {
   resource_group_name = module.variables.azure_resource_group
 }
 
+# configure app secgroup to defined who is proxy
+resource "azurerm_application_security_group" "web-proxy-asg" {
+  name                = "WebProxyAppGroup"
+  location            = module.variables.azure_location
+  resource_group_name = module.variables.azure_resource_group
+}
+
+# configure app secgroup to defined who can be proxied
+resource "azurerm_application_security_group" "behind-proxy-asg" {
+  name                = "BehindProxyAppGroup"
+  location            = module.variables.azure_location
+  resource_group_name = module.variables.azure_resource_group
+}
+
 # add rules to secgroup
+# Allow traffic for web-proxy
+resource "azurerm_network_security_rule" "allow-proxy-inbound" {
+  name                   = "Allow-ProxyInBound"
+  priority               = 105
+  direction              = "Inbound"
+  access                 = "Allow"
+  protocol               = "Tcp"
+  source_port_range      = "*"
+  destination_port_range = "8080"
+  source_application_security_group_ids = [
+    azurerm_application_security_group.behind-proxy-asg.id,
+  ]
+  destination_application_security_group_ids = [
+    azurerm_application_security_group.web-proxy-asg.id,
+  ]
+  resource_group_name         = module.variables.azure_resource_group
+  network_security_group_name = module.default_nsg.nsg_name
+}
+resource "azurerm_network_security_rule" "allow-proxy-outbound" {
+  name                   = "Allow-ProxyOutBound"
+  priority               = 105
+  direction              = "Outbound"
+  access                 = "Allow"
+  protocol               = "Tcp"
+  source_port_range      = "*"
+  destination_port_range = "8080"
+  source_application_security_group_ids = [
+    azurerm_application_security_group.behind-proxy-asg.id,
+  ]
+  destination_application_security_group_ids = [
+    azurerm_application_security_group.web-proxy-asg.id,
+  ]
+  resource_group_name         = module.variables.azure_resource_group
+  network_security_group_name = module.default_nsg.nsg_name
+}
+
 # Allow traffic in for cfssl
 resource "azurerm_network_security_rule" "allow-cfssl-inbound" {
   name                   = "Allow-CfsslInBound"
