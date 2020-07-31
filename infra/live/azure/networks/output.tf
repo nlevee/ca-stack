@@ -6,12 +6,8 @@ output "subnet_issuer_id" {
   value = module.network_proxy.subnet_ids[0]
 }
 
-output "subnet_proxy_id" {
-  value = module.network_proxy.subnet_ids[1]
-}
-
 output "subnet_web_id" {
-  value = module.network_proxy.subnet_ids[2]
+  value = module.network_proxy.subnet_ids[1]
 }
 
 

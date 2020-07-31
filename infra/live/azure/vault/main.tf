@@ -30,6 +30,7 @@ resource "azurerm_key_vault" "issuer-vault" {
     virtual_network_subnet_ids = [
       data.terraform_remote_state.networks.outputs.subnet_ca_id,
       data.terraform_remote_state.networks.outputs.subnet_issuer_id,
+      data.terraform_remote_state.networks.outputs.subnet_web_id,
     ]
   }
 }
@@ -55,6 +56,7 @@ resource "azurerm_key_vault" "vm-vault" {
     virtual_network_subnet_ids = [
       data.terraform_remote_state.networks.outputs.subnet_ca_id,
       data.terraform_remote_state.networks.outputs.subnet_issuer_id,
+      data.terraform_remote_state.networks.outputs.subnet_web_id,
     ]
   }
 }
