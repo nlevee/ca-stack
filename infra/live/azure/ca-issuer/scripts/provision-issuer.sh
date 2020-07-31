@@ -119,6 +119,6 @@ EOF
 # enable at boot and start cfssl server
 systemctl daemon-reload
 systemctl enable cfssl-server
-systemctl start cfssl-server
+systemctl restart cfssl-server
 
 exit 0

@@ -105,6 +105,6 @@ EOF
 # enable at boot and start cfssl server
 systemctl daemon-reload
 systemctl enable mitmproxy
-systemctl start mitmproxy
+systemctl restart mitmproxy
 
 exit 0
