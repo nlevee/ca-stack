@@ -57,7 +57,7 @@ cat <<EOF > remote_config.json
     }
   },
   "remotes": {
-    "ca-issuer": "ca-issuer-vm:8888"
+    "ca-issuer": "caissuervm:8888"
   }
 }
 EOF
@@ -81,5 +81,30 @@ openssl pkcs12 \
     -inkey mitmproxy-ca-key.pem \
     -in mitmproxy-ca-cert.pem \
     -password pass:
+
+# create system service to start issuer server
+[ ! -d "/etc/systemd/system" ] \
+    && mkdir -p /etc/systemd/system
+
+cat <<EOF > /etc/systemd/system/mitmproxy.service
+[Unit]
+Description=Mitmproxy server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/mitmdump
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# enable at boot and start cfssl server
+systemctl daemon-reload
+systemctl enable mitmproxy
+systemctl start mitmproxy
 
 exit 0
