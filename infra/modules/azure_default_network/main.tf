@@ -5,13 +5,17 @@ resource "azurerm_virtual_network" "network" {
   address_space       = [var.address_range]
 }
 resource "azurerm_subnet" "default" {
-  name                 = "default"
+  count = var.subnet_count
+
+  name                 = "${var.subnet_name}-${count.index}"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.network.name
-  address_prefixes     = [cidrsubnet(var.address_range, 8, 1)]
+  address_prefixes     = [cidrsubnet(var.address_range, 8, count.index)]
   service_endpoints    = var.service_endpoints
 }
 resource "azurerm_subnet_network_security_group_association" "default" {
-  subnet_id                 = azurerm_subnet.default.id
+  count = var.subnet_count
+
+  subnet_id                 = azurerm_subnet.default[count.index].id
   network_security_group_id = var.nsg_id
 }

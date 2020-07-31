@@ -1,17 +1,17 @@
 output "subnet_ca_id" {
-  value = module.network_ca.subnet_id
+  value = module.network_ca.subnet_ids[0]
 }
 
 output "subnet_issuer_id" {
-  value = module.network_issuer.subnet_id
-}
-
-output "subnet_web_id" {
-  value = module.network_web.subnet_id
+  value = module.network_proxy.subnet_ids[0]
 }
 
 output "subnet_proxy_id" {
-  value = module.network_proxy.subnet_id
+  value = module.network_proxy.subnet_ids[1]
+}
+
+output "subnet_web_id" {
+  value = module.network_proxy.subnet_ids[2]
 }
 
 

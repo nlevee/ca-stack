@@ -1,5 +1,5 @@
-output "subnet_id" {
-  value = azurerm_subnet.default.id
+output "subnet_ids" {
+  value = azurerm_subnet.default.*.id
 }
 
 output "network_id" {

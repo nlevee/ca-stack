@@ -5,6 +5,10 @@ infra_path=$(realpath ${base_path}/../../infra/live/azure)
 
 workflow=$1
 [ -z "${workflow}" ] && exit 1
+shift
+
+tf_action=${1:-apply}
+shift
 
 # load azure env
 source ${base_path}/.env
@@ -15,4 +19,4 @@ cd ${infra_path}/${workflow}
 [ ! -d ".terraform" ] \
     && terraform init -upgrade
 
-terraform ${2:-apply}
+terraform ${tf_action} $@

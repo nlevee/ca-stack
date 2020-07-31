@@ -7,6 +7,10 @@ variable "subnet_name" {
   default = "default"
 }
 
+variable "subnet_count" {
+  default = 1
+}
+
 variable "address_range" {
   type = string
 }
