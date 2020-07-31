@@ -21,12 +21,10 @@ curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/inst
 
 ## TODO
 
-- use CloudInit for init scripts
-- use var in provision script for vault and CA names
+- use template for provision script
 - terraform remote backend
 - bastion to access VM
 - add firewall.s
-- wip userspace
 
 ## Schema
 
