@@ -13,7 +13,6 @@ resource "azurerm_linux_virtual_machine" "userspace" {
   admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.issuer.id,
-    azurerm_network_interface.proxy.id,
   ]
 
   admin_ssh_key {
