@@ -57,7 +57,7 @@ cat <<EOF > remote_config.json
     }
   },
   "remotes": {
-    "ca-issuer": "caissuervm:8888"
+    "ca-issuer": "ca-issuer.ca-stack.lo:8888"
   }
 }
 EOF

@@ -21,3 +21,12 @@ data "terraform_remote_state" "vault" {
     path = "${path.module}/../vault/terraform.tfstate"
   }
 }
+
+# get issuer state
+data "terraform_remote_state" "issuer" {
+  backend = "local"
+
+  config = {
+    path = "${path.module}/../ca-issuer/terraform.tfstate"
+  }
+}

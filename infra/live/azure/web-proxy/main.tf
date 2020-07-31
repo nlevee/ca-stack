@@ -39,12 +39,13 @@ resource "azurerm_linux_virtual_machine" "web_proxy" {
 
 # add startup script
 resource "azurerm_virtual_machine_extension" "provision" {
-  name                 = "provision-proxy"
+  name                 = "provision"
   virtual_machine_id   = azurerm_linux_virtual_machine.web_proxy.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
+  // TODO : terraform_remote_state.issuer.issuer_fqdn
   protected_settings = <<SETTINGS
     {
         "script": "${filebase64("${path.module}/scripts/provision-proxy.sh")}"

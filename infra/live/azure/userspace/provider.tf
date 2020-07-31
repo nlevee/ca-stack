@@ -21,3 +21,12 @@ data "terraform_remote_state" "vault" {
     path = "${path.module}/../vault/terraform.tfstate"
   }
 }
+
+# get proxy state
+data "terraform_remote_state" "proxy" {
+  backend = "local"
+
+  config = {
+    path = "${path.module}/../web-proxy/terraform.tfstate"
+  }
+}

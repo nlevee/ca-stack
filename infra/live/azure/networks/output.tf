@@ -11,6 +11,15 @@ output "subnet_web_id" {
 }
 
 
+output "private_zone_id" {
+  value = azurerm_private_dns_zone.stack.id
+}
+
+output "private_zone_name" {
+  value = azurerm_private_dns_zone.stack.name
+}
+
+
 output "default_security_group_name" {
   value = module.default_nsg.nsg_name
 }

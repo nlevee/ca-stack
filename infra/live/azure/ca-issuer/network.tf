@@ -10,3 +10,12 @@ resource "azurerm_network_interface" "ca_issuer" {
     private_ip_address_allocation = "Dynamic"
   }
 }
+
+# add ip addr in issuer subnet
+resource "azurerm_private_dns_a_record" "ca_issuer" {
+  name                = "ca-issuer"
+  zone_name           = data.terraform_remote_state.networks.outputs.private_zone_name
+  resource_group_name = module.variables.azure_resource_group
+  ttl                 = 300
+  records             = [azurerm_network_interface.ca_issuer.private_ip_address]
+}

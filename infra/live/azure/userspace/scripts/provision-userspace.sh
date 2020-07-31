@@ -12,3 +12,12 @@ curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
 
 # update ca cert repos
 update-ca-certificates
+
+# configure system wide http/https proxy
+cat <<EOF > /etc/profile.d/proxy.sh
+export http_proxy="http://web-proxy.ca-stack.lo:8080"
+export https_proxy="http://web-proxy.ca-stack.lo:8080"
+export no_proxy=169.254.169.254
+EOF
+
+chmod +x /etc/profile.d/proxy.sh
