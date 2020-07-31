@@ -6,7 +6,7 @@ set -e
 AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r '.access_token')
 
 echo "Fetch Root Certificate from vault ..."
-curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
+curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
     "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" \
     | jq -r '.value' | base64 -d > /usr/local/share/ca-certificates/ca.crt
 
@@ -14,7 +14,7 @@ curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
 update-ca-certificates
 
 # fetch intermediate certificate
-curl -Ssf -H "Authorization: Bearer ${AccessToken}" -X GET \
+curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
     "https://ca-stack-issuer-vault.vault.azure.net/certificates/CaIntermediate2?api-version=7.0" \
     | jq -r '.cer' | base64 -d > /tmp/intermediate_ca.cer
 
@@ -57,7 +57,7 @@ cat <<EOF > remote_config.json
     }
   },
   "remotes": {
-    "ca-issuer": "ca-issuer.ca-stack.lo:8888"
+    "ca-issuer": "${issuer_fqdn}:8888"
   }
 }
 EOF

@@ -48,7 +48,9 @@ resource "azurerm_virtual_machine_extension" "provision" {
   // TODO : terraform_remote_state.issuer.issuer_fqdn
   protected_settings = <<SETTINGS
     {
-        "script": "${filebase64("${path.module}/scripts/provision-proxy.sh")}"
+        "script": "${base64encode(templatefile("${path.module}/scripts/provision-proxy.sh.tmpl", {
+  issuer_fqdn = data.terraform_remote_state.issuer.outputs.issuer_fqdn
+}))}"
     }
 SETTINGS
 }
