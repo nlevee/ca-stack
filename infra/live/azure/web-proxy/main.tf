@@ -49,7 +49,9 @@ resource "azurerm_virtual_machine_extension" "provision" {
   protected_settings = <<SETTINGS
     {
         "script": "${base64encode(templatefile("${path.module}/scripts/provision-proxy.sh.tmpl", {
-  issuer_fqdn = data.terraform_remote_state.issuer.outputs.issuer_fqdn
+  issuer_fqdn      = data.terraform_remote_state.issuer.outputs.issuer_fqdn
+  vm_vault_uri     = data.terraform_remote_state.vault.outputs.vm_vault_uri
+  issuer_vault_uri = data.terraform_remote_state.vault.outputs.issuer_vault_uri
 }))}"
     }
 SETTINGS

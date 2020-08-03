@@ -7,7 +7,7 @@ AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/ide
 
 echo "Fetch Root Certificate from vault ..."
 curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
-    "https://ca-stack-vm-vault.vault.azure.net/secrets/CaRootCert2?api-version=7.0" \
+    "${vm_vault_uri}secrets/CaRootCert2?api-version=7.0" \
     | jq -r '.value' | base64 -d > /usr/local/share/ca-certificates/ca.crt
 
 # update ca cert repos
@@ -15,7 +15,7 @@ update-ca-certificates
 
 # fetch intermediate certificate
 curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
-    "https://ca-stack-issuer-vault.vault.azure.net/certificates/CaIntermediate2?api-version=7.0" \
+    "${issuer_vault_uri}certificates/CaIntermediate2?api-version=7.0" \
     | jq -r '.cer' | base64 -d > /tmp/intermediate_ca.cer
 
 # convert cer certificate to pem
