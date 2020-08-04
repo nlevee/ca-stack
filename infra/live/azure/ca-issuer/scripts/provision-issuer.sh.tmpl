@@ -92,6 +92,32 @@ cat <<EOF > server-config.json
 }
 EOF
 
+mkdir -p ~/cfssl/server
+cat <<EOF > ~/cfssl/server/csr.json
+{
+  "CN": "MyOrg Issuer Server",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "FR",
+      "L":  "Paris",
+      "O":  "MyOrg",
+      "OU": "IT"
+    }
+  ],
+  "hosts": [
+      "${issuer_fqdn}", "${issuer_private_ip}"
+  ]
+}
+EOF
+cd ~/cfssl/server
+cfssl gencert \
+    -ca ../intermediate_ca.pem -ca-key ../intermediate_ca-key.pkcs8 \
+    -profile server -config ../server-config.json csr.json | cfssljson -bare server
+
 # create system service to start issuer server
 [ ! -d "/etc/systemd/system" ] \
     && mkdir -p /etc/systemd/system
@@ -107,7 +133,9 @@ ExecStart=/usr/local/sbin/cfssl serve \
     -config server-config.json \
     -address 0.0.0.0 -port 8888 \
     -ca intermediate_ca.pem \
-    -ca-key intermediate_ca-key.pkcs8
+    -ca-key intermediate_ca-key.pkcs8 \
+    -tls-key server/server-key.pem \
+    -tls-cert server/server.pem
 Restart=on-failure
 Type=simple
 WorkingDirectory=/root/cfssl

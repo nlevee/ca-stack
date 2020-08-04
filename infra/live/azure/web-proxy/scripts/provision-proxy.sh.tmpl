@@ -57,13 +57,15 @@ cat <<EOF > remote_config.json
     }
   },
   "remotes": {
-    "ca-issuer": "${issuer_fqdn}:8888"
+    "ca-issuer": "https://${issuer_fqdn}:8888"
   }
 }
 EOF
 
 # generate certificate for mitmproxy
-cfssl gencert -config remote_config.json -profile intermediate mitmproxy_csr.json | cfssljson -bare mitmproxy
+cfssl gencert \
+    -tls-remote-ca ~/intermediate_ca.pem \
+    -config remote_config.json -profile intermediate mitmproxy_csr.json | cfssljson -bare mitmproxy
 
 # config mitmproxy ca repos
 mv mitmproxy.pem mitmproxy-ca-cert.pem

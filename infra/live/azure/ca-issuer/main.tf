@@ -47,8 +47,10 @@ resource "azurerm_virtual_machine_extension" "provision" {
   protected_settings = <<SETTINGS
     {
         "script": "${base64encode(templatefile("${path.module}/scripts/provision-issuer.sh.tmpl", {
-  vm_vault_uri     = data.terraform_remote_state.vault.outputs.vm_vault_uri
-  issuer_vault_uri = data.terraform_remote_state.vault.outputs.issuer_vault_uri
+  issuer_fqdn       = azurerm_private_dns_a_record.ca_issuer.fqdn
+  issuer_private_ip = azurerm_network_interface.ca_issuer.private_ip_address
+  vm_vault_uri      = data.terraform_remote_state.vault.outputs.vm_vault_uri
+  issuer_vault_uri  = data.terraform_remote_state.vault.outputs.issuer_vault_uri
 }))}"
     }
 SETTINGS
