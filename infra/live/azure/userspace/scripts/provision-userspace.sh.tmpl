@@ -22,3 +22,10 @@ export no_proxy=169.254.169.254
 EOF
 
 chmod +x /etc/profile.d/proxy.sh
+
+cat <<EOF > /etc/apt/apt.conf.d/proxy.conf
+Acquire {
+  HTTP::proxy "http://${proxy_fqdn}:8080";
+  HTTPS::proxy "http://${proxy_fqdn}:8080";
+}
+EOF
