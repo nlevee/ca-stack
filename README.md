@@ -21,7 +21,6 @@ curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/inst
 
 ## TODO
 
-- use template for provision script
 - terraform remote backend
 - bastion to access VM
 - add firewall.s
@@ -49,6 +48,7 @@ Build des image avec packer :
 ./workflow/azure/build-images.sh ca-authority
 ./workflow/azure/build-images.sh ca-issuer
 ./workflow/azure/build-images.sh userspace
+./workflow/azure/build-images.sh web-proxy
 ```
 
 Build de l'infra :
