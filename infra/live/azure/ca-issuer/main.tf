@@ -44,6 +44,12 @@ resource "azurerm_virtual_machine_extension" "provision" {
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
+  depends_on = [
+    azurerm_key_vault_access_policy.vm_vault,
+    azurerm_key_vault_access_policy.issuer_vault,
+    azurerm_key_vault_access_policy.cfssl_vault,
+  ]
+
   protected_settings = <<SETTINGS
     {
         "script": "${base64encode(templatefile("${path.module}/scripts/provision-issuer.sh.tmpl", {
@@ -51,9 +57,11 @@ resource "azurerm_virtual_machine_extension" "provision" {
   issuer_private_ip = azurerm_network_interface.ca_issuer.private_ip_address
   vm_vault_uri      = data.terraform_remote_state.vault.outputs.vm_vault_uri
   issuer_vault_uri  = data.terraform_remote_state.vault.outputs.issuer_vault_uri
+  cfssl_vault_uri   = data.terraform_remote_state.vault.outputs.cfssl_vault_uri
 }))}"
     }
 SETTINGS
+
 }
 
 # access policy to access to vault
@@ -68,7 +76,6 @@ resource "azurerm_key_vault_access_policy" "vm_vault" {
   ]
 }
 
-# access policy to access to vault
 resource "azurerm_key_vault_access_policy" "issuer_vault" {
   key_vault_id = data.terraform_remote_state.vault.outputs.issuer_vault_id
 
@@ -81,5 +88,16 @@ resource "azurerm_key_vault_access_policy" "issuer_vault" {
 
   certificate_permissions = [
     "get"
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "cfssl_vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.cfssl_vault_id
+
+  tenant_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.ca_issuer.identity[0].principal_id
+
+  secret_permissions = [
+    "set"
   ]
 }

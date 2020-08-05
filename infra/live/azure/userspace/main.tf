@@ -44,7 +44,10 @@ resource "azurerm_virtual_machine_extension" "provision" {
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
-  // TODO : terraform_remote_state.proxy.web_proxy_fqdn
+  depends_on = [
+    azurerm_key_vault_access_policy.vm_vault,
+  ]
+
   protected_settings = <<SETTINGS
     {
         "script": "${base64encode(templatefile("${path.module}/scripts/provision-userspace.sh.tmpl", {

@@ -45,13 +45,19 @@ resource "azurerm_virtual_machine_extension" "provision" {
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
-  // TODO : terraform_remote_state.issuer.issuer_fqdn
+  depends_on = [
+    azurerm_key_vault_access_policy.vm_vault,
+    azurerm_key_vault_access_policy.issuer_vault,
+    azurerm_key_vault_access_policy.cfssl_vault,
+  ]
+
   protected_settings = <<SETTINGS
     {
         "script": "${base64encode(templatefile("${path.module}/scripts/provision-proxy.sh.tmpl", {
   issuer_fqdn      = data.terraform_remote_state.issuer.outputs.issuer_fqdn
   vm_vault_uri     = data.terraform_remote_state.vault.outputs.vm_vault_uri
   issuer_vault_uri = data.terraform_remote_state.vault.outputs.issuer_vault_uri
+  cfssl_vault_uri  = data.terraform_remote_state.vault.outputs.cfssl_vault_uri
 }))}"
     }
 SETTINGS
@@ -75,6 +81,17 @@ resource "azurerm_key_vault_access_policy" "issuer_vault" {
   object_id = azurerm_linux_virtual_machine.web_proxy.identity[0].principal_id
 
   certificate_permissions = [
+    "get"
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "cfssl_vault" {
+  key_vault_id = data.terraform_remote_state.vault.outputs.cfssl_vault_id
+
+  tenant_id = azurerm_linux_virtual_machine.web_proxy.identity[0].tenant_id
+  object_id = azurerm_linux_virtual_machine.web_proxy.identity[0].principal_id
+
+  secret_permissions = [
     "get"
   ]
 }

@@ -44,6 +44,11 @@ resource "azurerm_virtual_machine_extension" "provision" {
   type                 = "CustomScript"
   type_handler_version = "2.0"
 
+  depends_on = [
+    azurerm_key_vault_access_policy.vm_vault,
+    azurerm_key_vault_access_policy.issuer_vault,
+  ]
+
   protected_settings = <<SETTINGS
     {
       "script": "${base64encode(templatefile("${path.module}/scripts/provision-authority.sh.tmpl", {
