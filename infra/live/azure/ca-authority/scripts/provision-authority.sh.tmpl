@@ -102,6 +102,8 @@ AccessToken=$(curl -Ssf -H "Metadata: true" "http://169.254.169.254/metadata/ide
 cd ~
 
 echo "Import Root Certificate in Vault ..."
+touch cert.json
+chmod 700 cert.json
 cat <<EOF > cert.json
 {
 "value": "$(base64 ~/cfssl/ca.pem)"
@@ -113,15 +115,17 @@ curl -fSs -H "Authorization: Bearer $${AccessToken}" -H "Content-type: applicati
 rm -f cert.json
 
 echo "Import Intermediate Certificate in Vault ..."
-cat <<EOF > cert.json
+touch intermediate.json
+chmod 700 intermediate.json
+cat <<EOF > intermediate.json
 {
   "value": "$(base64 ~/cfssl/intermediate/intermediate.pem)"
 }
 EOF
 curl -fSs -H "Authorization: Bearer $${AccessToken}" -H "Content-type: application/json" -X POST \
     "${issuer_vault_uri}certificates/CaIntermediate2/import?api-version=7.0" \
-    -d @cert.json
-rm -f intermediate.json
+    -d @intermediate.json
+rm -f intermediate.json 
 
 # shutdown VM
 shutdown &
