@@ -23,7 +23,8 @@ curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/inst
 
 - terraform remote backend
 - bastion to access VM
-- add firewall.s
+- optim firewall
+- add ocsp responder
 
 ## Schema
 
