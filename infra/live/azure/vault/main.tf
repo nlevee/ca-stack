@@ -9,54 +9,34 @@ data "terraform_remote_state" "networks" {
   }
 }
 
-# vault for ca-issuer
-resource "azurerm_key_vault" "issuer-vault" {
-  name                     = "${module.variables.azure_resource_group}-issuer-vault"
-  location                 = module.variables.azure_location
-  resource_group_name      = module.variables.azure_resource_group
-  tenant_id                = data.azurerm_client_config.current.tenant_id
-  soft_delete_enabled      = true
-  purge_protection_enabled = false
-
-  sku_name = "standard"
-
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-
-    ip_rules = var.ip_rules
-
-    # assign access from subnet
-    virtual_network_subnet_ids = [
-      data.terraform_remote_state.networks.outputs.subnet_ca_id,
-      data.terraform_remote_state.networks.outputs.subnet_issuer_id,
-      data.terraform_remote_state.networks.outputs.subnet_web_id,
-    ]
-  }
+locals {
+  issuer_vault_name = "${module.variables.azure_resource_group}-issuer-vault"
+  vm_vault_name     = "${module.variables.azure_resource_group}-vm-vault"
 }
 
-# vault for vm usage
-resource "azurerm_key_vault" "vm-vault" {
-  name                     = "${module.variables.azure_resource_group}-vm-vault"
-  location                 = module.variables.azure_location
-  resource_group_name      = module.variables.azure_resource_group
-  tenant_id                = data.azurerm_client_config.current.tenant_id
-  soft_delete_enabled      = true
-  purge_protection_enabled = false
+module "issuer_vault" {
+  source = "../../../modules/azure_default_vault"
 
-  sku_name = "standard"
+  vault_name          = local.issuer_vault_name
+  location            = module.variables.azure_location
+  resource_group_name = module.variables.azure_resource_group
+  ip_rules            = var.ip_rules
+  subnet_ids = [
+    data.terraform_remote_state.networks.outputs.subnet_ca_id,
+    data.terraform_remote_state.networks.outputs.subnet_issuer_id,
+    data.terraform_remote_state.networks.outputs.subnet_web_id,
+  ]
+}
+module "vm_vault" {
+  source = "../../../modules/azure_default_vault"
 
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-
-    ip_rules = var.ip_rules
-
-    # assign access from subnet
-    virtual_network_subnet_ids = [
-      data.terraform_remote_state.networks.outputs.subnet_ca_id,
-      data.terraform_remote_state.networks.outputs.subnet_issuer_id,
-      data.terraform_remote_state.networks.outputs.subnet_web_id,
-    ]
-  }
+  vault_name          = local.vm_vault_name
+  location            = module.variables.azure_location
+  resource_group_name = module.variables.azure_resource_group
+  ip_rules            = var.ip_rules
+  subnet_ids = [
+    data.terraform_remote_state.networks.outputs.subnet_ca_id,
+    data.terraform_remote_state.networks.outputs.subnet_issuer_id,
+    data.terraform_remote_state.networks.outputs.subnet_web_id,
+  ]
 }

@@ -1,23 +1,23 @@
 output "vm_vault_id" {
-  value = azurerm_key_vault.vm-vault.id
+  value = module.vm_vault.vault_id
 }
 
 output "vm_vault_name" {
-  value = azurerm_key_vault.vm-vault.name
+  value = local.vm_vault_name
 }
 
 output "vm_vault_uri" {
-  value = azurerm_key_vault.vm-vault.vault_uri
+  value = module.vm_vault.vault_uri
 }
 
 output "issuer_vault_id" {
-  value = azurerm_key_vault.issuer-vault.id
+  value = module.issuer_vault.vault_id
 }
 
 output "issuer_vault_name" {
-  value = azurerm_key_vault.issuer-vault.name
+  value = local.issuer_vault_name
 }
 
 output "issuer_vault_uri" {
-  value = azurerm_key_vault.issuer-vault.vault_uri
+  value = module.issuer_vault.vault_uri
 }
