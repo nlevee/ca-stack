@@ -20,6 +20,7 @@ curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
 
 # convert cer certificate to pem
 openssl x509 -inform DER -in /tmp/intermediate_ca.cer -out ~/intermediate_ca.pem
+rm -f /tmp/intermediate_ca.cer
 
 [ ! -d ~/.mitmproxy ] \
     && mkdir ~/.mitmproxy
@@ -48,12 +49,27 @@ cat <<EOF > mitmproxy_csr.json
 }
 EOF
 
+# fetch auth.key from cfssl vault
+touch cfssl-auth.key
+chmod 700 cfssl-auth.key
+curl -Ssf -H "Authorization: Bearer $${AccessToken}" -X GET \
+    "${cfssl_vault_uri}secrets/DefaultAuthKey?api-version=7.0" \
+    | jq -r '.value' | base64 -d > cfssl-auth.key
+
+# config for remote access
 touch remote_config.json
 cat <<EOF > remote_config.json
 {
   "signing": {
     "default": {
-      "remote": "ca-issuer"
+      "remote": "ca-issuer",
+      "auth_key": "ca-issuer"
+    }
+  },
+  "auth_keys": {
+    "ca-issuer": {
+      "type":"standard",
+      "key":"file:$(pwd)/cfssl-auth.key"
     }
   },
   "remotes": {

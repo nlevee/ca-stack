@@ -34,11 +34,36 @@ mv intermediate_ca.0.pem intermediate_ca-key.pkcs8
 chmod 700 intermediate_ca-key.pkcs8
 mv intermediate_ca.1.pem intermediate_ca.pem
 
+# generate auth-key to access cfssl server
+touch cfssl-auth.key
+chmod 700 cfssl-auth.key
+openssl rand 32 | xxd -p -c 32 > cfssl-auth.key
+
+# import key in cfssl vault
+touch cfssl-key.json
+chmod 700 cfssl-key.json
+cat <<EOF > cfssl-key.json
+{
+"value": "$(base64 cfssl-auth.key)"
+}
+EOF
+curl -fSs -H "Authorization: Bearer $${AccessToken}" -H "Content-type: application/json" -X PUT \
+    "${cfssl_vault_uri}secrets/DefaultAuthKey?api-version=7.0" \
+    -d @cfssl-key.json
+rm -f cfssl-key.json
+
 # serve issuer server
 cat <<EOF > server-config.json
 {
+  "auth_keys": {
+    "default": {
+      "type":"standard",
+      "key":"file:$(pwd)/cfssl-auth.key"
+    }
+  },
   "signing":{
     "default":{
+      "auth_key": "default",
       "expiry":"720h"
     },
     "profiles":{
