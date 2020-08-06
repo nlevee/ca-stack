@@ -21,6 +21,8 @@ curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/inst
 
 Installer [terraform-docs](https://github.com/terraform-docs/terraform-docs)
 
+Sur Linux :
+
 ```bash
 curl -Lo ./terraform-docs https://github.com/terraform-docs/terraform-docs/releases/download/v0.10.0-rc.1/terraform-docs-v0.10.0-rc.1-$(uname | tr '[:upper:]' '[:lower:]')-amd64
 chmod +x ./terraform-docs
