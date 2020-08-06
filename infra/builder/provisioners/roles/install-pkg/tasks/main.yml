@@ -1,5 +1,5 @@
 ---
-- name: install required packages
+- name: Install required packages
   become: true
   package:
     name: "{{ required_packages }}"

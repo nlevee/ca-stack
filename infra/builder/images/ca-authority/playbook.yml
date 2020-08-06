@@ -6,8 +6,10 @@
     cfssl_version: "1.4.1"
 
   tasks:
-    - include_role:
+    - name: "Install common packages"
+      include_role:
         name: "{{ playbook_dir }}/../../provisioners/roles/install-pkg"
 
-    - include_role:
+    - name: "Install cfssl binaries"
+      include_role:
         name: "{{ playbook_dir }}/../../provisioners/roles/install-cfssl"
