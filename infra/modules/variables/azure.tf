@@ -1,15 +1,8 @@
-variable "workspace_to_azure_resource_group" {
-  type = map
-
-  default = {
+locals {
+  workspace_to_azure_resource_group = {
     "azure-staging" = "ca-stack"
   }
-}
-
-variable "workspace_to_azure_location" {
-  type = map
-
-  default = {
+  workspace_to_azure_location = {
     "azure-staging" = "West Europe"
   }
 }
