@@ -1,3 +1,4 @@
 variable "workspace" {
-  type = string
+  description = "Workspace name to get vars"
+  type        = string
 }
