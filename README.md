@@ -39,6 +39,17 @@ sudo mv ./terraform-docs /usr/local/bin/terraform-docs
 - add descriptions for variables/outputs
 - use terradoc
 
+## Tests
+
+Les tests d'infra sont dans `infra/test`.
+
+Pour lancer les tests :
+
+```bash
+cd infra/test
+go test
+```
+
 ## Schema
 
 ```txt
