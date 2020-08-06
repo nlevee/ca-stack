@@ -1,7 +1,11 @@
 module "variables" {
   source = "../../../modules/variables"
 
-  workspace = "azure-staging"
+  workspace = var.workspace
+}
+
+variable "workspace" {
+  default = "azure-staging"
 }
 
 variable "ip_rules" {
