@@ -19,12 +19,23 @@ Sur Linux :
 curl -SsL https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 ```
 
+Installer [terraform-docs](https://github.com/terraform-docs/terraform-docs)
+
+```bash
+curl -Lo ./terraform-docs https://github.com/terraform-docs/terraform-docs/releases/download/v0.10.0-rc.1/terraform-docs-v0.10.0-rc.1-$(uname | tr '[:upper:]' '[:lower:]')-amd64
+chmod +x ./terraform-docs
+sudo mv ./terraform-docs /usr/local/bin/terraform-docs
+```
+
 ## TODO
 
 - terraform remote backend
 - bastion to access VM
 - optim firewall
 - add ocsp responder
+- use terratest
+- add descriptions for variables/outputs
+- use terradoc
 
 ## Schema
 
