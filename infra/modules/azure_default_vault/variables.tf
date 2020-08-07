@@ -1,13 +1,16 @@
 variable "location" {
-  type = string
+  description = "Location (West Europe, ...) in azure"
+  type        = string
 }
 
 variable "resource_group_name" {
-  type = string
+  description = "Resource group in azure"
+  type        = string
 }
 
 variable "vault_name" {
-  type = string
+  description = "Vault name (must be unique)"
+  type        = string
 }
 
 variable "ip_rules" {
