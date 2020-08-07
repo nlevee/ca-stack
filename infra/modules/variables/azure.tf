@@ -4,7 +4,7 @@ locals {
     "azure-testing" = "testing-ca-stack"
   }
   workspace_to_azure_location = {
-    "azure-staging" = "West Europe"
-    "azure-testing" = "West Europe"
+    "azure-staging" = "westeurope"
+    "azure-testing" = "francecentral"
   }
 }

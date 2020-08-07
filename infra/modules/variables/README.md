@@ -4,7 +4,9 @@ Module use to match a workspace to env variables
 
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
 
 ## Providers
 
@@ -14,6 +16,7 @@ No provider.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| name\_suffix | Suffix to add to all name outputs | `string` | `""` | no |
 | workspace | Workspace name to get vars | `string` | n/a | yes |
 
 ## Outputs

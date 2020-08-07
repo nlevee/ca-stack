@@ -1,59 +1,51 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 )
 
-var workingDir = "../modules/variables"
+func TestTfModuleVariables(t *testing.T) {
+	t.Parallel()
 
-var checkOutputs = []string{
-	"azure_location",
-	"azure_resource_group",
-}
+	rootDir := "../"
 
-func TestTfModuleVariablesNotExists(t *testing.T) {
-	terraformOptions := &terraform.Options{
+	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/variables")
+
+	nameSuffix := fmt.Sprintf("-%s", random.UniqueId())
+
+	azureOptions := &terraform.Options{
 		// Set the path to the Terraform code that will be tested.
 		TerraformDir: workingDir,
 		Vars: map[string]interface{}{
-			"workspace": "not-exists",
+			"workspace":   "azure-testing",
+			"name_suffix": nameSuffix,
 		},
 	}
 
-	// Clean up resources with "terraform destroy" at the end of the test.
-	defer terraform.Destroy(t, terraformOptions)
-
-	// Run "terraform init" and "terraform apply". Fail the test if there are any errors.
-	terraform.InitAndApply(t, terraformOptions)
-
-	// Run `terraform output` to get the values of output variables and check they have the expected values.
-	for _, outName := range checkOutputs {
-		output := terraform.Output(t, terraformOptions, outName)
-		assert.Empty(t, output)
-	}
+	defer terraform.Destroy(t, azureOptions)
+	terraform.InitAndApply(t, azureOptions)
+	validateModVar(t, azureOptions, nameSuffix)
 }
 
-func TestTfModuleVariablesAzure(t *testing.T) {
-	terraformOptions := &terraform.Options{
-		// Set the path to the Terraform code that will be tested.
-		TerraformDir: workingDir,
-		Vars: map[string]interface{}{
-			"workspace": "azure-testing",
-		},
+func validateModVar(t *testing.T, opts *terraform.Options, suffix string) {
+	checkOutputs := []string{
+		"azure_location",
+		"azure_resource_group",
 	}
-
-	// Clean up resources with "terraform destroy" at the end of the test.
-	defer terraform.Destroy(t, terraformOptions)
-
-	// Run "terraform init" and "terraform apply". Fail the test if there are any errors.
-	terraform.InitAndApply(t, terraformOptions)
-
-	// Run `terraform output` to get the values of output variables and check they have the expected values.
 	for _, outName := range checkOutputs {
-		output := terraform.Output(t, terraformOptions, outName)
+		// Run `terraform output` to get the values of output variables and check they have the expected values.
+		output := terraform.Output(t, opts, outName)
 		assert.NotEmpty(t, output)
 	}
+
+	// check if suffix is apply
+	output := terraform.Output(t, opts, "azure_resource_group")
+	regex := fmt.Sprintf("%s$", suffix)
+	assert.Regexp(t, regex, output)
 }

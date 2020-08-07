@@ -5,5 +5,5 @@ output "azure_location" {
 
 output "azure_resource_group" {
   description = "Resource group in azure"
-  value       = lookup(local.workspace_to_azure_resource_group, var.workspace, "")
+  value       = "${lookup(local.workspace_to_azure_resource_group, var.workspace, "")}${var.name_suffix}"
 }
