@@ -2,8 +2,8 @@
 resource "azurerm_subnet" "firewall" {
   name                 = "AzureFirewallSubnet"
   resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.network.name
-  address_prefixes     = [cidrsubnet(var.address_range, 8, var.subnet_count + 1)]
+  virtual_network_name = var.network_name
+  address_prefixes     = [var.subnet_address_range]
 }
 
 # add public ip for firewall
@@ -34,12 +34,6 @@ resource "azurerm_route_table" "default" {
   location                      = var.location
   resource_group_name           = var.resource_group_name
   disable_bgp_route_propagation = false
-}
-resource "azurerm_subnet_route_table_association" "default" {
-  count = var.subnet_count
-
-  subnet_id      = azurerm_subnet.default[count.index].id
-  route_table_id = azurerm_route_table.default.id
 }
 
 # add default rule to next hop firewall
