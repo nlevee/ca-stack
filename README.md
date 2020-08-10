@@ -38,6 +38,7 @@ sudo mv ./terraform-docs /usr/local/bin/terraform-docs
 - use terratest
 - add descriptions for variables/outputs
 - use terradoc
+- stop using custom script ext. (use cloud-init)
 
 ## Tests
 

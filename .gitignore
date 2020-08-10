@@ -5,3 +5,4 @@ workflow/azure/.env
 *.tfstate
 *.tfstate.*
 infra/**/my.auto.tfvars
+.vscode/
