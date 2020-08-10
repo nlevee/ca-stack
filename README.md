@@ -68,6 +68,21 @@ WEB <-N2- PROXY <-N1- USERSPACE
 
 ## Usage
 
+Créé un fichier `.env` dans `workflow/azure/` sur le modele :
+
+```bash
+export ARM_CLIENT_ID=
+export ARM_CLIENT_SECRET=
+export ARM_SUBSCRIPTION_ID=
+export ARM_TENANT_ID=
+```
+
+Build de l'environnement :
+
+```bash
+./workflow/azure/deploy-infra.sh global
+```
+
 Build des image avec packer :
 
 ```bash
