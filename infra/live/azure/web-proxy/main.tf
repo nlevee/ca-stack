@@ -30,10 +30,6 @@ resource "azurerm_linux_virtual_machine" "web_proxy" {
     type = "SystemAssigned"
   }
 
-  boot_diagnostics {
-    storage_account_uri = "https://castackbootdiag.blob.core.windows.net/"
-  }
-
   source_image_id = data.azurerm_image.web_proxy.id
 }
 
