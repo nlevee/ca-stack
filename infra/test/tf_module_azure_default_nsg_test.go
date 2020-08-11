@@ -15,29 +15,28 @@ func TestTfModuleAzureDefaultNsg(t *testing.T) {
 
 	rootDir := "../"
 
+	stageName := "mod_az_nsg"
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
 	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_nsg")
 
-	defer test_structure.RunTestStage(t, "cleanup_global", func() {
+	defer test_structure.RunTestStage(t, "teardown_"+stageName, func() {
+		undeployModAzNsg(t, workingDir)
 		undeployAzGlobal(t, globalDir)
 	})
 
-	defer test_structure.RunTestStage(t, "cleanup_nsg", func() {
-		undeployModAzNsg(t, workingDir)
-	})
-
-	test_structure.RunTestStage(t, "deploy_global", func() {
+	test_structure.RunTestStage(t, "deploy_"+stageName+"_rg", func() {
 		configAzGlobal(t, globalDir)
 	})
 
-	test_structure.RunTestStage(t, "deploy_nsg", func() {
+	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
 		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
 		deployModAzNsg(t, workingDir, rgName, rgLocation)
 	})
 
-	test_structure.RunTestStage(t, "validate", func() {
+	test_structure.RunTestStage(t, "validate_"+stageName, func() {
 		validateNsg(t, workingDir)
 	})
 }
@@ -61,6 +60,8 @@ func deployModAzNsg(t *testing.T, workingDir string, resourceGroup string, locat
 	}
 	test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)
 
+	test_structure.SaveString(t, workingDir, "nsgName", nsgName)
+
 	terraform.InitAndApply(t, terraformOptions)
 }
 
@@ -76,4 +77,9 @@ func validateNsg(t *testing.T, workingDir string) {
 		output := terraform.Output(t, terraformOptions, outName)
 		assert.NotEmpty(t, output)
 	}
+
+	// check if name is apply
+	nsgName := test_structure.LoadString(t, workingDir, "nsgName")
+	output := terraform.Output(t, terraformOptions, "nsg_name")
+	assert.Equal(t, nsgName, output)
 }

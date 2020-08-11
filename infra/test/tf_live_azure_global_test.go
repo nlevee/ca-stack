@@ -15,17 +15,19 @@ func TestTfLiveAzureGlobal(t *testing.T) {
 
 	rootDir := "../"
 
+	stageName := "live_az_global"
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
-	defer test_structure.RunTestStage(t, "cleanup_global", func() {
+	defer test_structure.RunTestStage(t, "cleanup_"+stageName, func() {
 		undeployAzGlobal(t, globalDir)
 	})
 
-	test_structure.RunTestStage(t, "deploy_global", func() {
+	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
 		deployAzGlobal(t, globalDir)
 	})
 
-	test_structure.RunTestStage(t, "validate", func() {
+	test_structure.RunTestStage(t, "validate_"+stageName, func() {
 		validateAzGlobal(t, globalDir)
 	})
 }

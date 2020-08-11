@@ -15,29 +15,28 @@ func TestTfModuleAzureDefaultVault(t *testing.T) {
 
 	rootDir := "../"
 
+	stageName := "mod_az_vault"
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
 	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_vault")
 
-	defer test_structure.RunTestStage(t, "cleanup_global", func() {
+	defer test_structure.RunTestStage(t, "teardown_"+stageName, func() {
+		undeployModAzVault(t, workingDir)
 		undeployAzGlobal(t, globalDir)
 	})
 
-	defer test_structure.RunTestStage(t, "cleanup_vault", func() {
-		undeployModAzVault(t, workingDir)
-	})
-
-	test_structure.RunTestStage(t, "deploy_global", func() {
+	test_structure.RunTestStage(t, "deploy_"+stageName+"_rg", func() {
 		configAzGlobal(t, globalDir)
 	})
 
-	test_structure.RunTestStage(t, "deploy_vault", func() {
+	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
 		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
 		deployModAzVault(t, workingDir, rgName, rgLocation)
 	})
 
-	test_structure.RunTestStage(t, "validate", func() {
+	test_structure.RunTestStage(t, "validate_"+stageName, func() {
 		validateVault(t, workingDir)
 	})
 }
