@@ -1,11 +1,14 @@
 variable "name" {
-  type = string
+  description = "Security group name"
+  type        = string
 }
 
 variable "location" {
-  type = string
+  description = "Location (West Europe, ...) in azure"
+  type        = string
 }
 
 variable "resource_group_name" {
-  type = string
+  description = "Resource group in azure"
+  type        = string
 }
