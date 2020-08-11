@@ -12,12 +12,14 @@ variable "nsg_id" {
 
 variable "subnet_names" {
   description = "Subnet list names to create, each subnet's address range is compute from 'address_range' variable"
-  default     = ["sub0"]
+  default     = ["default"]
+  type        = list(string)
 }
 
 variable "service_endpoints" {
   description = "Endpoints list to connect to this network"
   default     = []
+  type        = list(string)
 }
 
 variable "location" {
