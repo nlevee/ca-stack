@@ -1,10 +1,8 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -16,6 +14,12 @@ func TestTfModuleAzureDefaultVault(t *testing.T) {
 	rootDir := "../"
 
 	stageName := "mod_az_vault"
+
+	// Uncomment these when doing local testing if you need to skip any stages.
+	// os.Setenv("SKIP_deploy_"+stageName+"_rg", "true")
+	// os.Setenv("SKIP_deploy_"+stageName, "true")
+	// os.Setenv("SKIP_validate_"+stageName, "true")
+	// os.Setenv("SKIP_teardown_"+stageName, "true")
 
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
@@ -42,19 +46,9 @@ func TestTfModuleAzureDefaultVault(t *testing.T) {
 }
 
 func configAzGlobal(t *testing.T, workingDir string) {
-	uniqueID := random.UniqueId()
+	deployAzGlobal(t, workingDir)
 
-	terraformOptions := &terraform.Options{
-		// Set the path to the Terraform code that will be tested.
-		TerraformDir: workingDir,
-		Vars: map[string]interface{}{
-			"workspace":   "azure-testing",
-			"name_suffix": fmt.Sprintf("-%s", uniqueID),
-		},
-	}
-	test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)
-
-	terraform.InitAndApply(t, terraformOptions)
+	terraformOptions := test_structure.LoadTerraformOptions(t, workingDir)
 
 	rgLocation := terraform.Output(t, terraformOptions, "resource_group_location")
 	test_structure.SaveString(t, workingDir, "rgLocation", rgLocation)
@@ -94,6 +88,6 @@ func validateVault(t *testing.T, workingDir string) {
 
 	for _, outName := range checkOutputs {
 		output := terraform.Output(t, terraformOptions, outName)
-		assert.NotEmpty(t, output)
+		assert.NotEmpty(t, output, outName+" is empty")
 	}
 }

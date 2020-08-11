@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -10,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestTfModuleAzureDefaultNetwork start testing Azure Default Network terraform module
 func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 	t.Parallel()
 
@@ -17,12 +19,22 @@ func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 
 	stageName := "mod_az_network"
 
+	// Uncomment these when doing local testing if you need to skip any stages.
+	// os.Setenv("SKIP_deploy_"+stageName+"_rg", "true")
+	// os.Setenv("SKIP_deploy_"+stageName+"_nsg", "true")
+	// os.Setenv("SKIP_deploy_"+stageName, "true")
+	// os.Setenv("SKIP_validate_"+stageName, "true")
+	// os.Setenv("SKIP_teardown_"+stageName, "true")
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
+
+	nsgDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_nsg")
 
 	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_network")
 
 	defer test_structure.RunTestStage(t, "teardown_"+stageName, func() {
 		undeployModAzNetwork(t, workingDir)
+		undeployModAzNsg(t, nsgDir)
 		undeployAzGlobal(t, globalDir)
 	})
 
@@ -30,10 +42,24 @@ func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 		configAzGlobal(t, globalDir)
 	})
 
+	test_structure.RunTestStage(t, "deploy_"+stageName+"_nsg", func() {
+		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
+		rgName := test_structure.LoadString(t, globalDir, "rgName")
+
+		deployModAzNsg(t, nsgDir, rgName, rgLocation)
+
+		terraformOptions := test_structure.LoadTerraformOptions(t, nsgDir)
+		nsgID := terraform.Output(t, terraformOptions, "nsg_id")
+
+		test_structure.SaveString(t, nsgDir, "nsgID", nsgID)
+	})
+
 	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
 		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
-		deployModAzNetwork(t, workingDir, rgName, rgLocation)
+		nsgID := test_structure.LoadString(t, nsgDir, "nsgID")
+
+		deployModAzNetwork(t, workingDir, rgName, rgLocation, nsgID)
 	})
 
 	test_structure.RunTestStage(t, "validate_"+stageName, func() {
@@ -41,13 +67,15 @@ func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 	})
 }
 
+// undeployModAzNetwork destroy terraform module deployment
 func undeployModAzNetwork(t *testing.T, workingDir string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, workingDir)
 
 	terraform.Destroy(t, terraformOptions)
 }
 
-func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, location string) {
+// deployModAzNetwork init and apply terraform module
+func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, location string, nsgID string) {
 	networkName := fmt.Sprintf("terratest-network-%s", random.UniqueId())
 
 	terraformOptions := &terraform.Options{
@@ -57,6 +85,12 @@ func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, l
 			"address_range":       "10.50.0.0/16",
 			"location":            location,
 			"resource_group_name": resourceGroup,
+			"subnet_names": []string{
+				"subnet0",
+				"subnet1",
+			},
+			"service_endpoints": []string{"Microsoft.KeyVault"},
+			"nsg_id":            nsgID,
 		},
 	}
 	test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)
@@ -64,15 +98,24 @@ func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, l
 	terraform.InitAndApply(t, terraformOptions)
 }
 
+// validateNetwork check output from terraform module
 func validateNetwork(t *testing.T, workingDir string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, workingDir)
 
+	subnetNames := terraformOptions.Vars["subnet_names"].([]interface{})
+
 	output := terraform.Output(t, terraformOptions, "network_id")
-	assert.NotEmpty(t, output)
+	assert.NotEmpty(t, output, "network_id is empty")
 
 	subnets := terraform.OutputList(t, terraformOptions, "subnet_ids")
-	assert.Len(t, subnets, 1)
+	assert.Len(t, subnets, len(subnetNames), "`subnet_ids` length is invalid")
 
 	addresses := terraform.OutputList(t, terraformOptions, "subnet_address_ranges")
-	assert.Len(t, addresses, 1)
+	assert.Len(t, addresses, len(subnetNames), "`subnet_address_ranges` length is invalid")
+
+	// check addresses
+	for _, cidr := range addresses {
+		_, _, err := net.ParseCIDR(cidr)
+		assert.Nil(t, err, "net.ParseCIDR")
+	}
 }

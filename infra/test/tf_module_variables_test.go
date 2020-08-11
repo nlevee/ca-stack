@@ -47,5 +47,5 @@ func validateModVar(t *testing.T, opts *terraform.Options, suffix string) {
 	// check if suffix is apply
 	output := terraform.Output(t, opts, "azure_resource_group")
 	regex := fmt.Sprintf("%s$", suffix)
-	assert.Regexp(t, regex, output)
+	assert.Regexp(t, regex, output, "suffix "+suffix+" is not in `azure_resource_group`")
 }

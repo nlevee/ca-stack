@@ -17,6 +17,12 @@ func TestTfModuleAzureDefaultNsg(t *testing.T) {
 
 	stageName := "mod_az_nsg"
 
+	// Uncomment these when doing local testing if you need to skip any stages.
+	// os.Setenv("SKIP_deploy_"+stageName+"_rg", "true")
+	// os.Setenv("SKIP_deploy_"+stageName, "true")
+	// os.Setenv("SKIP_validate_"+stageName, "true")
+	// os.Setenv("SKIP_teardown_"+stageName, "true")
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
 	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_nsg")
@@ -60,8 +66,6 @@ func deployModAzNsg(t *testing.T, workingDir string, resourceGroup string, locat
 	}
 	test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)
 
-	test_structure.SaveString(t, workingDir, "nsgName", nsgName)
-
 	terraform.InitAndApply(t, terraformOptions)
 }
 
@@ -75,11 +79,10 @@ func validateNsg(t *testing.T, workingDir string) {
 
 	for _, outName := range checkOutputs {
 		output := terraform.Output(t, terraformOptions, outName)
-		assert.NotEmpty(t, output)
+		assert.NotEmpty(t, output, outName+"is empty")
 	}
 
 	// check if name is apply
-	nsgName := test_structure.LoadString(t, workingDir, "nsgName")
 	output := terraform.Output(t, terraformOptions, "nsg_name")
-	assert.Equal(t, nsgName, output)
+	assert.Equal(t, terraformOptions.Vars["name"], output, "nsg_name is not equal to -var")
 }

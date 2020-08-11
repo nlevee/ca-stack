@@ -17,9 +17,14 @@ func TestTfLiveAzureGlobal(t *testing.T) {
 
 	stageName := "live_az_global"
 
+	// Uncomment these when doing local testing if you need to skip any stages.
+	// os.Setenv("SKIP_deploy_"+stageName, "true")
+	// os.Setenv("SKIP_validate_"+stageName, "true")
+	// os.Setenv("SKIP_teardown_"+stageName, "true")
+
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
-	defer test_structure.RunTestStage(t, "cleanup_"+stageName, func() {
+	defer test_structure.RunTestStage(t, "teardown_"+stageName, func() {
 		undeployAzGlobal(t, globalDir)
 	})
 
@@ -66,6 +71,6 @@ func validateAzGlobal(t *testing.T, workingDir string) {
 
 	for _, outName := range checkOutputs {
 		output := terraform.Output(t, terraformOptions, outName)
-		assert.NotEmpty(t, output)
+		assert.NotEmpty(t, output, outName+" is empty")
 	}
 }
