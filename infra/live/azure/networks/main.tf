@@ -30,7 +30,7 @@ module "network_proxy" {
   address_range       = "10.2.0.0/16"
   service_endpoints   = ["Microsoft.KeyVault"]
   nsg_id              = module.default_nsg.nsg_id
-  subnet_count        = 2
+  subnet_names        = ["default-0", "default-1"]
 }
 module "firewall_proxy" {
   source = "../../../modules/azure_default_firewall"

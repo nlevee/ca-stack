@@ -2,31 +2,30 @@ variable "network_name" {
   type = string
 }
 
-variable "subnet_name" {
-  type    = string
-  default = "default"
-}
-
-variable "subnet_count" {
-  default = 1
-}
-
 variable "address_range" {
   type = string
 }
 
-variable "location" {
-  type = string
+variable "nsg_id" {
+  default = ""
 }
 
-variable "resource_group_name" {
-  type = string
+variable "subnet_names" {
+  description = "Subnet list names to create, each subnet's address range is compute from 'address_range' variable"
+  default     = ["sub0"]
 }
 
 variable "service_endpoints" {
-  default = []
+  description = "Endpoints list to connect to this network"
+  default     = []
 }
 
-variable "nsg_id" {
-  type = string
+variable "location" {
+  description = "Location (West Europe, ...) in azure"
+  type        = string
+}
+
+variable "resource_group_name" {
+  description = "Resource group in azure"
+  type        = string
 }
