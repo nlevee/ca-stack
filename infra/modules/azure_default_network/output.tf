@@ -5,7 +5,7 @@ output "subnet_ids" {
 
 output "subnet_address_ranges" {
   description = "Address range computed for each subnet created"
-  value       = azurerm_subnet.default.*.address_prefixes[0]
+  value       = azurerm_subnet.default[*].address_prefixes[0]
 }
 
 output "network_id" {
