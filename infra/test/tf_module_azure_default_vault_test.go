@@ -71,14 +71,10 @@ func undeployModAzVault(t *testing.T, workingDir string) {
 }
 
 func deployModAzVault(t *testing.T, workingDir string, resourceGroup string, location string) {
-	uniqueID := random.UniqueId()
-
-	vaultName := fmt.Sprintf("terratest-vault-%s", uniqueID)
-
 	terraformOptions := &terraform.Options{
 		TerraformDir: workingDir,
 		Vars: map[string]interface{}{
-			"vault_name":          vaultName,
+			"vault_name":          "terratest-vault",
 			"location":            location,
 			"resource_group_name": resourceGroup,
 		},
@@ -94,6 +90,7 @@ func validateVault(t *testing.T, workingDir string) {
 	checkOutputs := []string{
 		"vault_id",
 		"vault_uri",
+		"vault_name",
 	}
 
 	for _, outName := range checkOutputs {

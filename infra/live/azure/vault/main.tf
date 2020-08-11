@@ -1,24 +1,7 @@
-
-data "azurerm_client_config" "current" {}
-
-data "terraform_remote_state" "networks" {
-  backend = "local"
-
-  config = {
-    path = "${path.module}/../networks/terraform.tfstate"
-  }
-}
-
-locals {
-  cfssl_vault_name  = "${module.variables.azure_resource_group}-cfssl-vault"
-  issuer_vault_name = "${module.variables.azure_resource_group}-issuer-vault"
-  vm_vault_name     = "${module.variables.azure_resource_group}-vm-vault"
-}
-
 module "cfssl_vault" {
   source = "../../../modules/azure_default_vault"
 
-  vault_name          = local.cfssl_vault_name
+  vault_name          = "cfssl"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
   ip_rules            = var.ip_rules
@@ -30,7 +13,7 @@ module "cfssl_vault" {
 module "issuer_vault" {
   source = "../../../modules/azure_default_vault"
 
-  vault_name          = local.issuer_vault_name
+  vault_name          = "issuer"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
   ip_rules            = var.ip_rules
@@ -43,7 +26,7 @@ module "issuer_vault" {
 module "vm_vault" {
   source = "../../../modules/azure_default_vault"
 
-  vault_name          = local.vm_vault_name
+  vault_name          = "vm"
   location            = module.variables.azure_location
   resource_group_name = module.variables.azure_resource_group
   ip_rules            = var.ip_rules

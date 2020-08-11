@@ -9,7 +9,7 @@ variable "resource_group_name" {
 }
 
 variable "vault_name" {
-  description = "Vault name (must be unique)"
+  description = "Vault basename (a suffix is added to make it unique)"
   type        = string
 }
 
