@@ -21,20 +21,16 @@ func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 
 	// Uncomment these when doing local testing if you need to skip any stages.
 	// os.Setenv("SKIP_deploy_"+stageName+"_rg", "true")
-	// os.Setenv("SKIP_deploy_"+stageName+"_nsg", "true")
 	// os.Setenv("SKIP_deploy_"+stageName, "true")
 	// os.Setenv("SKIP_validate_"+stageName, "true")
 	// os.Setenv("SKIP_teardown_"+stageName, "true")
 
 	globalDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "live/azure/global")
 
-	nsgDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_nsg")
-
 	workingDir := test_structure.CopyTerraformFolderToTemp(t, rootDir, "modules/azure_default_network")
 
 	defer test_structure.RunTestStage(t, "teardown_"+stageName, func() {
 		undeployModAzNetwork(t, workingDir)
-		undeployModAzNsg(t, nsgDir)
 		undeployAzGlobal(t, globalDir)
 	})
 
@@ -42,24 +38,10 @@ func TestTfModuleAzureDefaultNetwork(t *testing.T) {
 		configAzGlobal(t, globalDir)
 	})
 
-	test_structure.RunTestStage(t, "deploy_"+stageName+"_nsg", func() {
-		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
-		rgName := test_structure.LoadString(t, globalDir, "rgName")
-
-		deployModAzNsg(t, nsgDir, rgName, rgLocation)
-
-		terraformOptions := test_structure.LoadTerraformOptions(t, nsgDir)
-		nsgID := terraform.Output(t, terraformOptions, "nsg_id")
-
-		test_structure.SaveString(t, nsgDir, "nsgID", nsgID)
-	})
-
 	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
-		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
-		nsgID := test_structure.LoadString(t, nsgDir, "nsgID")
 
-		deployModAzNetwork(t, workingDir, rgName, rgLocation, nsgID)
+		deployModAzNetwork(t, workingDir, rgName)
 	})
 
 	test_structure.RunTestStage(t, "validate_"+stageName, func() {
@@ -75,7 +57,7 @@ func undeployModAzNetwork(t *testing.T, workingDir string) {
 }
 
 // deployModAzNetwork init and apply terraform module
-func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, location string, nsgID string) {
+func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string) {
 	networkName := fmt.Sprintf("terratest-network-%s", random.UniqueId())
 
 	terraformOptions := &terraform.Options{
@@ -83,14 +65,12 @@ func deployModAzNetwork(t *testing.T, workingDir string, resourceGroup string, l
 		Vars: map[string]interface{}{
 			"network_name":        networkName,
 			"address_range":       "10.50.0.0/16",
-			"location":            location,
 			"resource_group_name": resourceGroup,
 			"subnet_names": []string{
 				"subnet0",
 				"subnet1",
 			},
 			"service_endpoints": []string{"Microsoft.KeyVault"},
-			"nsg_id":            nsgID,
 		},
 	}
 	test_structure.SaveTerraformOptions(t, workingDir, terraformOptions)

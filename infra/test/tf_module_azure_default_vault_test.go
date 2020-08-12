@@ -35,9 +35,8 @@ func TestTfModuleAzureDefaultVault(t *testing.T) {
 	})
 
 	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
-		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
-		deployModAzVault(t, workingDir, rgName, rgLocation)
+		deployModAzVault(t, workingDir, rgName)
 	})
 
 	test_structure.RunTestStage(t, "validate_"+stageName, func() {
@@ -63,12 +62,11 @@ func undeployModAzVault(t *testing.T, workingDir string) {
 	terraform.Destroy(t, terraformOptions)
 }
 
-func deployModAzVault(t *testing.T, workingDir string, resourceGroup string, location string) {
+func deployModAzVault(t *testing.T, workingDir string, resourceGroup string) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: workingDir,
 		Vars: map[string]interface{}{
 			"vault_name":          "terratest-vault",
-			"location":            location,
 			"resource_group_name": resourceGroup,
 		},
 	}

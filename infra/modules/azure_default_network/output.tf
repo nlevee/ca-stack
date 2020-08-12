@@ -1,6 +1,6 @@
 output "subnet_ids" {
   description = "Id for each subnet created"
-  value       = azurerm_subnet.default.*.id
+  value       = azurerm_subnet.default[*].id
 }
 
 output "subnet_address_ranges" {
@@ -10,5 +10,5 @@ output "subnet_address_ranges" {
 
 output "network_id" {
   description = "Created etwork Id"
-  value       = azurerm_virtual_network.network.id
+  value       = azurerm_virtual_network.default.id
 }

@@ -10,29 +10,13 @@ output "subnet_web_id" {
   value = module.network_proxy.subnet_ids[1]
 }
 
-output "proxy_firewall_name" {
-  value = module.firewall_proxy.fw_name
-}
-
-output "proxy_firewall_public_ip" {
-  value = module.firewall_proxy.fw_public_ip
-}
-
-output "ca_firewall_name" {
-  value = module.firewall_ca.fw_name
-}
-
-output "ca_firewall_public_ip" {
-  value = module.firewall_ca.fw_public_ip
-}
-
 
 output "private_zone_id" {
-  value = azurerm_private_dns_zone.stack.id
+  value = azurerm_private_dns_zone.proxy.id
 }
 
 output "private_zone_name" {
-  value = azurerm_private_dns_zone.stack.name
+  value = azurerm_private_dns_zone.proxy.name
 }
 
 

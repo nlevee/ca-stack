@@ -60,8 +60,6 @@ func deployAzGlobal(t *testing.T, workingDir string) {
 }
 
 func validateAzGlobal(t *testing.T, workingDir string) {
-
-	// Load the Terraform Options saved by the earlier deploy_terraform stage
 	terraformOptions := test_structure.LoadTerraformOptions(t, workingDir)
 
 	checkOutputs := []string{

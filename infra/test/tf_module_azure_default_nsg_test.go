@@ -37,9 +37,8 @@ func TestTfModuleAzureDefaultNsg(t *testing.T) {
 	})
 
 	test_structure.RunTestStage(t, "deploy_"+stageName, func() {
-		rgLocation := test_structure.LoadString(t, globalDir, "rgLocation")
 		rgName := test_structure.LoadString(t, globalDir, "rgName")
-		deployModAzNsg(t, workingDir, rgName, rgLocation)
+		deployModAzNsg(t, workingDir, rgName)
 	})
 
 	test_structure.RunTestStage(t, "validate_"+stageName, func() {
@@ -53,14 +52,13 @@ func undeployModAzNsg(t *testing.T, workingDir string) {
 	terraform.Destroy(t, terraformOptions)
 }
 
-func deployModAzNsg(t *testing.T, workingDir string, resourceGroup string, location string) {
+func deployModAzNsg(t *testing.T, workingDir string, resourceGroup string) {
 	nsgName := fmt.Sprintf("terratest-nsg-%s", random.UniqueId())
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: workingDir,
 		Vars: map[string]interface{}{
 			"name":                nsgName,
-			"location":            location,
 			"resource_group_name": resourceGroup,
 		},
 	}

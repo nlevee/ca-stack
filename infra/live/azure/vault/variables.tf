@@ -14,6 +14,6 @@ variable "name_suffix" {
 }
 
 variable "ip_rules" {
-  type    = list
+  type    = list(string)
   default = []
 }
